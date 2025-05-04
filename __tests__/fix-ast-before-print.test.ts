@@ -198,6 +198,7 @@ describe('ObjectProperty', () => {
       const obj5 = { foo: bar(123) }
       const obj6 = { [foo]: foo }
       const obj7 = { [foo]: bar }
+      const { foo, bar = 1 } = {}
     `;
 
     const { code } = transform(source, {

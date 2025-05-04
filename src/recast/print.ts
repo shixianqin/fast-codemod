@@ -31,8 +31,9 @@ function __fixAstBeforePrint (ast: ParseResult) {
       }
 
       const { key, value } = node;
+      const _value = t.isAssignmentPattern(value) ? value.left : value;
 
-      node.shorthand = t.isIdentifier(key) && t.isIdentifier(value) && key.name === value.name;
+      node.shorthand = t.isIdentifier(key) && t.isIdentifier(_value) && key.name === _value.name;
     },
   });
 }
