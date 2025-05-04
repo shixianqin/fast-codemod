@@ -1,0 +1,11 @@
+export * from './add-imports';
+export * from './codemod';
+export * from './generate-uid';
+export * from './recast/parse';
+export * from './recast/print';
+export * from './remap-object';
+export * from './transform';
+export * from './traverse-references';
+export { type NodePath, type VisitNode, type Visitor } from '@babel/traverse';
+export * as t from '@babel/types';
+export * as types from '@babel/types';

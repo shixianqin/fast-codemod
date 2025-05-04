@@ -1,0 +1,47 @@
+{
+  "name": "fast-codemod",
+  "version": "0.0.1",
+  "description": "An easy-to-use codemod toolkit for code migration - powered by Babel and Recast, with format-preserving output.",
+  "license": "MIT",
+  "author": "shixianqin",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./babel/traverse": "./dist/babel/traverse.js",
+    "./babel/types": "./dist/babel/types.js",
+    "./recast": "./dist/recast/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest"
+  },
+  "keywords": [
+    "codemod",
+    "migration",
+    "migrator",
+    "transform",
+    "ast",
+    "babel",
+    "recast"
+  ],
+  "dependencies": {
+    "@babel/parser": "^7.27.0",
+    "@babel/traverse": "^7.27.0",
+    "@babel/types": "^7.27.0",
+    "@types/babel__traverse": "^7.20.7",
+    "chalk": "^5.4.1",
+    "diff": "8.0.0-beta",
+    "fast-glob": "^3.3.3",
+    "recast": "0.23.11"
+  },
+  "devDependencies": {
+    "@braveforge/eslint-config": "0.0.17",
+    "@types/node": "^22.14.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
