@@ -1,10 +1,10 @@
 import traverse, { type NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { getProgramPath } from '../get-program-path';
+import { findProgramPath } from '../utils/find-path';
 import type { ImportKind, ImportPath } from './types';
 
 export function getImports (path: NodePath, source: string, importKinds: ImportKind[]) {
-  const programPath = getProgramPath(path);
+  const programPath = findProgramPath(path);
   const importPaths: ImportPath[] = [];
 
   let lastImportPath: undefined | ImportPath;

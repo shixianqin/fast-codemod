@@ -1,8 +1,8 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import fg, { type Options as GlobOptions, type Pattern as GlobPattern } from 'fast-glob';
-import { printDiff } from './print-diff';
 import type { PrintResult } from './recast/print';
 import { transform, type FileInfo, type TransformOptions } from './transform';
+import { printDiff } from './utils/print-diff';
 
 export interface CodemodOptions extends TransformOptions {
   source: GlobPattern;

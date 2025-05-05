@@ -1,7 +1,7 @@
 import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { generateUidIdentifier } from '../generate-uid';
-import { getImportDefaultLocal, getImportedName } from '../import-utils';
+import { generateUidIdentifier } from '../utils/generate-uid';
+import { getImportDefaultLocal, getImportedName } from '../utils/import-utils';
 import { getImports } from './get-imports';
 import type { AddImportOptions } from './types';
 

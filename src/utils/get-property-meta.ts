@@ -1,13 +1,27 @@
 import * as t from '@babel/types';
-import type { MemberNode, MemberPropertyNode } from './types';
 
-/**
- * 用于查找成员访问器的匹配条件
- */
 export interface PropertyMeta {
   computed?: boolean;
   name?: string;
 }
+
+export type MemberNode =
+  | t.JSXMemberExpression
+  | t.MemberExpression
+  | t.ObjectMethod
+  | t.ObjectProperty
+  | t.OptionalMemberExpression
+  | t.TSIndexedAccessType
+  | t.TSQualifiedName;
+
+export type PropertyNode =
+  | t.JSXMemberExpression['property']
+  | t.MemberExpression['property']
+  | t.ObjectMethod['key']
+  | t.ObjectProperty['key']
+  | t.OptionalMemberExpression['property']
+  | t.TSIndexedAccessType['indexType']
+  | t.TSQualifiedName['right'];
 
 /**
  * 从 TSIndexedAccessType 中查找字面量 key 节点
@@ -29,11 +43,11 @@ function getTSIndexType (memberNode: t.TSIndexedAccessType) {
 }
 
 /**
- * 获取对象成员的匹配信息
+ * 获取属性元信息
  * @param memberNode
  */
 export function getPropertyMeta (memberNode: MemberNode): PropertyMeta {
-  let propertyNode!: MemberPropertyNode;
+  let propertyNode!: PropertyNode;
   let computed: undefined | boolean;
   let name: undefined | string;
 

@@ -1,22 +1,33 @@
 import * as t from '@babel/types';
-import { getPropertyMeta } from '../traverse-references/get-property-meta';
-import type { LiteralObjectExpression, ObjectProperties, RemapObjectOptions } from './types';
+import { getPropertyMeta } from '../utils/get-property-meta';
+import type { LiteralObject, ObjectProperties, TransformObjectOptions } from './types';
 import { createValidKey } from './utils';
+
+function toMap<T extends object> (map: undefined | T) {
+  return new Map<string, T[keyof T]>(map ? Object.entries(map) : []);
+}
 
 /**
  * 基于字面量对象表达式转换
  * @param obj
  * @param options
  */
-export function remapByLiteralObject (obj: LiteralObjectExpression, options: RemapObjectOptions) {
+export function transformByLiteralObject (obj: LiteralObject, options: TransformObjectOptions) {
   const properties: ObjectProperties = [];
   const unmatchedProperties: ObjectProperties = [];
-  const keyMap = new Map(Object.entries(options.keyMap));
+  const remap = toMap(options.remap);
+  const extractor = toMap(options.extractor);
 
   for (const property of obj.properties) {
-    const newKey = keyMap.get(
-      getPropertyMeta(property).name!,
-    );
+    const name = getPropertyMeta(property).name!;
+    const extract = extractor.get(name);
+
+    if (extract) {
+      extract(property);
+      continue;
+    }
+
+    const newKey = remap.get(name);
 
     if (newKey) {
       const validNewKey = createValidKey(typeof newKey === 'string' ? newKey : newKey.key);

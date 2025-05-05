@@ -1,6 +1,6 @@
 import type { NodePath } from '@babel/traverse';
-import { getProgramPath } from '../get-program-path';
-import { getImportedName } from '../import-utils';
+import { findProgramPath } from '../utils/find-path';
+import { getImportedName } from '../utils/import-utils';
 import type { ReferencePattern } from './types';
 import { traverseReferences } from './index';
 
@@ -24,7 +24,7 @@ export function traverseImportReferences (
   source: string | RegExp,
   patterns: SpecifierReferencePattern[],
 ) {
-  const programPath = getProgramPath(path);
+  const programPath = findProgramPath(path);
 
   programPath.traverse({
     ImportDeclaration (path) {

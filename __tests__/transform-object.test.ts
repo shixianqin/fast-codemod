@@ -1,25 +1,25 @@
 import { describe, expect, test } from 'vitest';
-import { remapObject, types as t, transform, type RemapObjectOptions, type Transformer } from '../src';
+import { types as t, transform, transformObject, type Transformer, type TransformObjectOptions } from '../src';
 
-const ruleSimple: RemapObjectOptions = {
-  keyMap: {
+const ruleSimple: TransformObjectOptions = {
+  remap: {
     data: 'body',
     params: 'queryParams',
   },
 };
 
-const ruleWithNest: RemapObjectOptions = {
+const ruleWithNest: TransformObjectOptions = {
   ...ruleSimple,
   nestUnmatchedIn: 'config',
 };
 
-const ruleWithPreserve: RemapObjectOptions = {
+const ruleWithPreserve: TransformObjectOptions = {
   ...ruleSimple,
   preserveUnmatched: true,
 };
 
-const ruleWithGetterSetter: RemapObjectOptions = {
-  keyMap: {
+const ruleWithGetterSetter: TransformObjectOptions = {
+  remap: {
     params: 'queryParams',
     data: {
       get: true,
@@ -29,7 +29,7 @@ const ruleWithGetterSetter: RemapObjectOptions = {
   },
 };
 
-const createTransformer = (rule: RemapObjectOptions): Transformer => {
+const createTransformer = (options: TransformObjectOptions): Transformer => {
   return () => ({
     visitor: {
       CallExpression: (path) => {
@@ -43,7 +43,7 @@ const createTransformer = (rule: RemapObjectOptions): Transformer => {
           path.node._processed = true;
 
           path.replaceWith(
-            remapObject(path, path.node, rule),
+            transformObject(path, path.node, options),
           );
         }
 
@@ -53,7 +53,7 @@ const createTransformer = (rule: RemapObjectOptions): Transformer => {
       Identifier: (path) => {
         if (path.node.name === 'obj') {
           path.replaceWith(
-            remapObject(path, path.node, rule),
+            transformObject(path, path.node, options),
           );
         }
 
@@ -62,7 +62,7 @@ const createTransformer = (rule: RemapObjectOptions): Transformer => {
 
       ObjectExpression: (path) => {
         path.replaceWith(
-          remapObject(path, path.node, rule),
+          transformObject(path, path.node, options),
         );
 
         path.skip();
@@ -71,7 +71,7 @@ const createTransformer = (rule: RemapObjectOptions): Transformer => {
   });
 };
 
-function _transform (source: string, expected: string, rule: RemapObjectOptions) {
+function _transform (source: string, expected: string, rule: TransformObjectOptions) {
   const { code } = transform(source, {
     transformers: [createTransformer(rule)],
     recastOptions: {
@@ -286,7 +286,7 @@ describe('Unsafe Key', () => {
         '}',
       ].join('\n'),
       {
-        keyMap: {
+        remap: {
           data: '012',
           params: 'query-params',
         },
@@ -303,8 +303,8 @@ describe('Unsafe Key', () => {
         '}',
       ].join('\n'),
       {
-        keyMap: {},
         nestUnmatchedIn: 'foo-bar',
+        remap: {},
       },
     );
   });
@@ -327,13 +327,63 @@ describe('Unsafe Key', () => {
         '}',
       ].join('\n'),
       {
-        keyMap: {
+        remap: {
           'abc-': '-abc',
           data: '012',
           'query-params': {
             get: true,
             key: 'new-query-params',
             set: true,
+          },
+        },
+      },
+    );
+  });
+});
+
+describe('Options.extractor', () => {
+  test('extract property', () => {
+    _transform(
+      'const obj2 = { foo: 100 }',
+      'const obj2 = {}',
+      {
+        extractor: {
+          foo: (property) => {
+            expect(property.type).toBe('ObjectProperty');
+            // @ts-expect-error ignore
+            expect(property.key.name).toBe('foo');
+          },
+        },
+      },
+    );
+  });
+
+  test('extract method', () => {
+    _transform(
+      'const obj2 = { fn(){} }',
+      'const obj2 = {}',
+      {
+        extractor: {
+          fn: (property) => {
+            expect(property.type).toBe('ObjectMethod');
+            // @ts-expect-error ignore
+            expect(property.key.name).toBe('fn');
+          },
+        },
+      },
+    );
+  });
+
+  test('extract from identifier', () => {
+    _transform(
+      'const obj2 = xxx',
+      'const obj2 = xxx',
+      {
+        extractor: {
+          foo: (member) => {
+            expect(member.type).toBe('MemberExpression');
+            // @ts-expect-error ignore
+            expect(member.property.name).toBe('foo');
           },
         },
       },

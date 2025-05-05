@@ -1,8 +1,8 @@
 import { relative } from 'node:path';
 import chalk, { type ChalkInstance } from 'chalk';
 import { diffLines, diffWords, type ChangeObject } from 'diff';
-import type { PrintResult } from './recast/print';
-import type { FileInfo } from './transform';
+import type { PrintResult } from '../recast/print';
+import type { FileInfo } from '../transform';
 
 interface ChangePart extends ChangeObject<string> {
   _changeParts?: ChangePart[];

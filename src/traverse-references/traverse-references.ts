@@ -1,8 +1,7 @@
 import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { getPropertyMeta, type PropertyMeta } from './get-property-meta';
+import { getPropertyMeta, type MemberNode, type PropertyMeta } from '../utils/get-property-meta';
 import type {
-  MemberNode,
   MemberReferencePattern,
   ReferenceNode,
   ReferencePattern,
