@@ -1,6 +1,6 @@
 {
   "name": "fast-codemod",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An easy-to-use codemod toolkit for code migration - powered by Babel and Recast, with format-preserving output.",
   "license": "MIT",
   "author": "shixianqin",
