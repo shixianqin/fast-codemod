@@ -19,14 +19,19 @@ export interface NamespaceSpecifierPattern extends ReferencePattern {
 
 export type SpecifierReferencePattern = DefaultSpecifierPattern | NamedSpecifierPattern | NamespaceSpecifierPattern;
 
-export function traverseImportReferences (path: NodePath, source: string, patterns: SpecifierReferencePattern[]) {
+export function traverseImportReferences (
+  path: NodePath,
+  source: string | RegExp,
+  patterns: SpecifierReferencePattern[],
+) {
   const programPath = getProgramPath(path);
 
   programPath.traverse({
     ImportDeclaration (path) {
       const { node } = path;
+      const src = node.source.value;
 
-      if (node.source.value !== source) {
+      if (!(typeof source === 'string' ? src === source : source.test(src))) {
         return;
       }
 
