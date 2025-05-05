@@ -104,6 +104,8 @@ describe('ImportSpecifier', () => {
       import { type foo as barType } from 'foo'
       import type { fooType} from 'foo'
       import type {foo as fooType2 } from 'foo'
+
+      import { /*before*/ fooX /*after*/} from 'foo'
     `;
 
     const { code } = transform(source, {
