@@ -1,36 +1,42 @@
 import * as t from '@babel/types';
 import { getPropertyMeta } from '../utils/get-property-meta';
-import type { LiteralObject, ObjectProperties, TransformObjectOptions } from './types';
-import { createValidKey } from './utils';
+import type { ObjectProperties, StaticObject, TransformObjectOptions } from './types';
+import { createValidKey, objectMethodToFunctionExpression } from './utils';
 
 function toMap<T extends object> (map: undefined | T) {
   return new Map<string, T[keyof T]>(map ? Object.entries(map) : []);
 }
 
 /**
- * 基于字面量对象表达式转换
+ * 基于静态字面量对象表达式转换
  * @param obj
  * @param options
  */
-export function transformByLiteralObject (obj: LiteralObject, options: TransformObjectOptions) {
+export function byStaticObject (obj: StaticObject, options: TransformObjectOptions) {
   const properties: ObjectProperties = [];
   const unmatchedProperties: ObjectProperties = [];
-  const remap = toMap(options.remap);
-  const extractor = toMap(options.extractor);
+  const renameMap = toMap(options.rename);
+  const extractMap = toMap(options.extract);
 
   for (const property of obj.properties) {
     const name = getPropertyMeta(property).name!;
-    const extract = extractor.get(name);
+    const extract = extractMap.get(name);
 
     if (extract) {
-      extract(property);
+      extract(
+        t.isObjectMethod(property)
+          ? objectMethodToFunctionExpression(property)
+          : property.value as t.Expression,
+        property,
+      );
+
       continue;
     }
 
-    const newKey = remap.get(name);
+    const newKey = renameMap.get(name);
 
     if (newKey) {
-      const validNewKey = createValidKey(typeof newKey === 'string' ? newKey : newKey.key);
+      const validNewKey = createValidKey(typeof newKey === 'string' ? newKey : newKey.name);
 
       properties.push({
         ...property,
@@ -38,17 +44,17 @@ export function transformByLiteralObject (obj: LiteralObject, options: Transform
         key: validNewKey.id,
       });
     }
-    else if (options.preserveUnmatched) {
+    else if (options.flatUnmatched) {
       properties.push(property);
     }
-    else {
+    else if (options.wrapUnmatchedIn) {
       unmatchedProperties.push(property);
     }
   }
 
   // 嵌套未匹配的属性
-  if (options.nestUnmatchedIn && unmatchedProperties.length > 0) {
-    const validNestKey = createValidKey(options.nestUnmatchedIn);
+  if (unmatchedProperties.length > 0) {
+    const validNestKey = createValidKey(options.wrapUnmatchedIn!);
 
     properties.push(
       t.objectProperty(

@@ -7,13 +7,13 @@ import { createValidKey } from './utils';
  * @param objectId
  * @param options
  */
-export function transformByIdentifier (objectId: t.Identifier, options: TransformObjectOptions) {
+export function byIdentifier (objectId: t.Identifier, options: TransformObjectOptions) {
   const properties: ObjectProperties = [];
 
-  if (options.remap) {
-    for (const [oldKey, newKey] of Object.entries(options.remap)) {
-      const newKeyObj = typeof newKey === 'string' ? { key: newKey } : newKey;
-      const validNewKey = createValidKey(newKeyObj.key);
+  if (options.rename) {
+    for (const [oldKey, newKey] of Object.entries(options.rename)) {
+      const newKeyObj = typeof newKey === 'string' ? { name: newKey } : newKey;
+      const validNewKey = createValidKey(newKeyObj.name);
       const validOldKey = createValidKey(oldKey);
 
       const memberExp = t.memberExpression(
@@ -69,27 +69,27 @@ export function transformByIdentifier (objectId: t.Identifier, options: Transfor
     }
   }
 
-  if (options.extractor) {
-    for (const key of Object.keys(options.extractor)) {
+  if (options.extract) {
+    for (const [key, extract] of Object.entries(options.extract)) {
       const validKey = createValidKey(key);
 
-      const exp = t.memberExpression(
+      const memberExp = t.memberExpression(
         objectId,
         validKey.id,
         validKey.computed,
       );
 
-      options.extractor[key](exp);
+      extract(memberExp, memberExp);
     }
   }
 
-  if (options.preserveUnmatched) {
+  if (options.flatUnmatched === true) {
     properties.unshift(
       t.spreadElement(objectId),
     );
   }
-  else if (options.nestUnmatchedIn) {
-    const validNestKey = createValidKey(options.nestUnmatchedIn);
+  else if (options.wrapUnmatchedIn) {
+    const validNestKey = createValidKey(options.wrapUnmatchedIn);
 
     properties.push(
       t.objectProperty(

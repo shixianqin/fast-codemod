@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { types as t, transform, transformObject, type Transformer, type TransformObjectOptions } from '../src';
+import { t, transform, transformObject, type Transformer, type TransformObjectOptions } from '../src';
 
 const ruleSimple: TransformObjectOptions = {
-  remap: {
+  cachedVariableName: '_config',
+  rename: {
     data: 'body',
     params: 'queryParams',
   },
@@ -10,20 +11,21 @@ const ruleSimple: TransformObjectOptions = {
 
 const ruleWithNest: TransformObjectOptions = {
   ...ruleSimple,
-  nestUnmatchedIn: 'config',
+  wrapUnmatchedIn: 'config',
 };
 
 const ruleWithPreserve: TransformObjectOptions = {
   ...ruleSimple,
-  preserveUnmatched: true,
+  flatUnmatched: true,
 };
 
 const ruleWithGetterSetter: TransformObjectOptions = {
-  remap: {
+  ...ruleSimple,
+  rename: {
     params: 'queryParams',
     data: {
       get: true,
-      key: 'body',
+      name: 'body',
       set: true,
     },
   },
@@ -97,7 +99,7 @@ describe('Literal Object', () => {
     );
   });
 
-  test('With nestUnmatchedIn', () => {
+  test('With wrapUnmatchedIn', () => {
     _transform(
       'const foo = { data: {}, params: {}, otherA: 123, otherB: "abc" }',
       [
@@ -159,7 +161,7 @@ describe('Identifier', () => {
     );
   });
 
-  test('With nestUnmatchedIn', () => {
+  test('With wrapUnmatchedIn', () => {
     _transform(
       'const foo = obj',
       [
@@ -213,25 +215,25 @@ describe('Expression', () => {
     _transform(
       'const foo = getObj()',
       [
-        'const _tempObj = getObj();',
+        'const _config = getObj();',
         'const foo = {',
-        '  body: _tempObj.data,',
-        '  queryParams: _tempObj.params,',
+        '  body: _config.data,',
+        '  queryParams: _config.params,',
         '}',
       ].join('\n'),
       ruleSimple,
     );
   });
 
-  test('With nestUnmatchedIn', () => {
+  test('With wrapUnmatchedIn', () => {
     _transform(
       'const foo = getObj()',
       [
-        'const _tempObj = getObj();',
+        'const _config = getObj();',
         'const foo = {',
-        '  body: _tempObj.data,',
-        '  queryParams: _tempObj.params,',
-        '  config: _tempObj,',
+        '  body: _config.data,',
+        '  queryParams: _config.params,',
+        '  config: _config,',
         '}',
       ].join('\n'),
       ruleWithNest,
@@ -242,11 +244,11 @@ describe('Expression', () => {
     _transform(
       'const foo = getObj()',
       [
-        'const _tempObj = getObj();',
+        'const _config = getObj();',
         'const foo = {',
-        '  ..._tempObj,',
-        '  body: _tempObj.data,',
-        '  queryParams: _tempObj.params,',
+        '  ..._config,',
+        '  body: _config.data,',
+        '  queryParams: _config.params,',
         '}',
       ].join('\n'),
       ruleWithPreserve,
@@ -257,16 +259,16 @@ describe('Expression', () => {
     _transform(
       'const foo = getObj()',
       [
-        'const _tempObj = getObj();',
+        'const _config = getObj();',
         'const foo = {',
-        '  queryParams: _tempObj.params,',
+        '  queryParams: _config.params,',
         '',
         '  get body() {',
-        '    return _tempObj.data;',
+        '    return _config.data;',
         '  },',
         '',
         '  set body(value) {',
-        '    _tempObj.data = value;',
+        '    _config.data = value;',
         '  },',
         '}',
       ].join('\n'),
@@ -286,7 +288,7 @@ describe('Unsafe Key', () => {
         '}',
       ].join('\n'),
       {
-        remap: {
+        rename: {
           data: '012',
           params: 'query-params',
         },
@@ -294,7 +296,7 @@ describe('Unsafe Key', () => {
     );
   });
 
-  test('With nestUnmatchedIn', () => {
+  test('With wrapUnmatchedIn', () => {
     _transform(
       'const foo = obj',
       [
@@ -303,8 +305,8 @@ describe('Unsafe Key', () => {
         '}',
       ].join('\n'),
       {
-        nestUnmatchedIn: 'foo-bar',
-        remap: {},
+        rename: {},
+        wrapUnmatchedIn: 'foo-bar',
       },
     );
   });
@@ -327,12 +329,12 @@ describe('Unsafe Key', () => {
         '}',
       ].join('\n'),
       {
-        remap: {
+        rename: {
           'abc-': '-abc',
           data: '012',
           'query-params': {
             get: true,
-            key: 'new-query-params',
+            name: 'new-query-params',
             set: true,
           },
         },
@@ -347,11 +349,9 @@ describe('Options.extractor', () => {
       'const obj2 = { foo: 100 }',
       'const obj2 = {}',
       {
-        extractor: {
+        extract: {
           foo: (property) => {
-            expect(property.type).toBe('ObjectProperty');
-            // @ts-expect-error ignore
-            expect(property.key.name).toBe('foo');
+            expect(property.type).toBe('NumericLiteral');
           },
         },
       },
@@ -363,9 +363,9 @@ describe('Options.extractor', () => {
       'const obj2 = { fn(){} }',
       'const obj2 = {}',
       {
-        extractor: {
-          fn: (property) => {
-            expect(property.type).toBe('ObjectMethod');
+        extract: {
+          fn: (exp, property) => {
+            expect(exp.type).toBe('FunctionExpression');
             // @ts-expect-error ignore
             expect(property.key.name).toBe('fn');
           },
@@ -379,7 +379,7 @@ describe('Options.extractor', () => {
       'const obj2 = xxx',
       'const obj2 = xxx',
       {
-        extractor: {
+        extract: {
           foo: (member) => {
             expect(member.type).toBe('MemberExpression');
             // @ts-expect-error ignore

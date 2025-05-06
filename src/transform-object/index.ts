@@ -1,22 +1,24 @@
 import type { NodePath } from '@babel/traverse';
 import type * as t from '@babel/types';
 import { addVariable } from '../utils/add-variable';
-import { transformByIdentifier } from './transform-by-identifier';
-import { transformByLiteralObject } from './transform-by-literal-object';
+import { byIdentifier } from './by-identifier';
+import { byStaticObject } from './by-static-object';
 import type { TransformObjectOptions } from './types';
-import { isLiteralObject } from './utils';
+import { isStaticObject } from './utils';
+
+export { type StaticObject, type TransformObjectOptions } from './types';
 
 export function transformObject (path: NodePath, node: t.Expression, options: TransformObjectOptions): t.ObjectExpression {
-  if (isLiteralObject(node)) {
-    return transformByLiteralObject(node, options);
+  if (isStaticObject(node)) {
+    return byStaticObject(node, options);
   }
 
-  return transformByIdentifier(
+  return byIdentifier(
     addVariable(path, node, {
-      name: '_tempObj',
+      name: options.cachedVariableName || '_obj',
     }),
     options,
   );
 }
 
-export { type TransformObjectOptions } from './types';
+export { isStaticObject } from './utils';
