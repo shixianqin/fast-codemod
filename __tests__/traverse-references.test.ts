@@ -1,7 +1,8 @@
 import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { describe, expect, test } from 'vitest';
-import { transform, traverseReferences, type ReferencePattern, type ReferenceVisitor } from '../src';
+import { transform } from '../src';
+import { traverseReferences, type ReferencePattern, type ReferenceVisitor } from '../src/helpers';
 
 function _transform (source: string, expected: string) {
   const prefix = 'let foo; ';
@@ -28,6 +29,7 @@ function visit (level: number, hint?: string): ReferenceVisitor {
     handler?: (name: string) => t.Node,
   ) => {
     const name = `$_${type}_${level}${hint ? '_' + hint : ''}`;
+
     path.replaceWith(handler ? handler(name) : t.identifier(name));
   };
 
@@ -167,6 +169,7 @@ describe('Direct', () => {
 
   test('Scope Safety', () => {
     const suffix = '{ const foo = 1; foo }; function fn () { const foo = 1; foo }';
+
     _transform('foo();' + suffix, '$_Identifier_1();' + suffix);
   });
 

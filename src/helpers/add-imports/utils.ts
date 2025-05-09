@@ -1,6 +1,5 @@
 import * as t from '@babel/types';
-
-export type ImportSpecifier = t.ImportDeclaration['specifiers'][0];
+import type { ImportSpecifier } from './types';
 
 export function getImportDefaultLocal (specifier: ImportSpecifier) {
   if (t.isImportDefaultSpecifier(specifier)) {
@@ -12,6 +11,7 @@ export function getImportDefaultLocal (specifier: ImportSpecifier) {
 
 export function getImportedName (specifier: t.ImportSpecifier) {
   const { imported } = specifier;
+
   return t.isIdentifier(imported) ? imported.name : imported.value;
 }
 

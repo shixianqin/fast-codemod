@@ -1,6 +1,7 @@
 import * as t from '@babel/types';
 import { expect, test } from 'vitest';
-import { transform, traverseImportReferences, type SpecifierReferencePattern } from '../src';
+import { transform } from '../src';
+import { traverseImportReferences, type SpecifierReferencePattern } from '../src/helpers';
 
 function replace (type: SpecifierReferencePattern['type'], name: string): SpecifierReferencePattern {
   return {

@@ -1,6 +1,7 @@
 import type * as t from '@babel/types';
 import chalk, { type ChalkInstance } from 'chalk';
 import type { FileInfo } from '../transform';
+import { createFileUrl } from './hyper-link';
 
 export interface ReportInfo {
   message: string;
@@ -10,28 +11,34 @@ export interface ReportInfo {
 
 export function report (fileInfo: undefined | FileInfo, info: ReportInfo) {
   let text: ChalkInstance;
+  let symbol: string;
 
   switch (info.severity) {
     case 'error': {
       text = chalk.red.bold;
+      symbol = '❌';
       break;
     }
 
     case 'info': {
-      text = chalk.blue.bold;
+      text = chalk;
+      symbol = 'ℹ️';
       break;
     }
 
     // case 'warn':
     default: {
       text = chalk.yellow.bold;
+      symbol = '⚠️';
       break;
     }
   }
 
-  const start = info.node?.loc?.start;
-  const position = start ? `:${start.line}:${start.column}` : '';
-  const content = `[Transform report ${info.severity || 'warn'}] - ${(fileInfo?.path || '') + position}`;
-
-  console.log(text(`${content}\n${info.message}`));
+  console.log(
+    symbol,
+    text(`[TRANSFORM ${(info.severity || 'warn').toUpperCase()}]`),
+    '-',
+    createFileUrl(fileInfo, info.node),
+    text(`\n${info.message}`),
+  );
 }

@@ -1,6 +1,7 @@
 import type { NodePath } from '@babel/traverse';
 import { describe, expect, test } from 'vitest';
-import { generateUid, transform } from '../src';
+import { transform } from '../src';
+import { generateUid } from '../src/helpers';
 
 const source = `
   const foo = 1

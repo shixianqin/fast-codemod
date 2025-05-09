@@ -1,7 +1,7 @@
 import * as t from '@babel/types';
-import { getPropertyMeta } from '../utils/get-property-meta';
+import { createValidProperty, getPropertyMeta } from '../property';
 import type { ObjectProperties, StaticObject, TransformObjectOptions } from './types';
-import { createValidKey, objectMethodToFunctionExpression } from './utils';
+import { methodToFunction } from './utils';
 
 function toMap<T extends object> (map: undefined | T) {
   return new Map<string, T[keyof T]>(map ? Object.entries(map) : []);
@@ -12,21 +12,19 @@ function toMap<T extends object> (map: undefined | T) {
  * @param obj
  * @param options
  */
-export function byStaticObject (obj: StaticObject, options: TransformObjectOptions) {
+export function transformFromStaticObject (obj: StaticObject, options: TransformObjectOptions) {
   const properties: ObjectProperties = [];
   const unmatchedProperties: ObjectProperties = [];
   const renameMap = toMap(options.rename);
   const extractMap = toMap(options.extract);
 
   for (const property of obj.properties) {
-    const name = getPropertyMeta(property).name!;
+    const name = getPropertyMeta(property).key!;
     const extract = extractMap.get(name);
 
     if (extract) {
       extract(
-        t.isObjectMethod(property)
-          ? objectMethodToFunctionExpression(property)
-          : property.value as t.Expression,
+        t.isObjectMethod(property) ? methodToFunction(property) : property.value,
         property,
       );
 
@@ -36,12 +34,11 @@ export function byStaticObject (obj: StaticObject, options: TransformObjectOptio
     const newKey = renameMap.get(name);
 
     if (newKey) {
-      const validNewKey = createValidKey(typeof newKey === 'string' ? newKey : newKey.name);
+      const validProperty = createValidProperty(typeof newKey === 'string' ? newKey : newKey.name);
 
       properties.push({
         ...property,
-        computed: validNewKey.computed,
-        key: validNewKey.id,
+        ...validProperty,
       });
     }
     else if (options.flatUnmatched) {
@@ -54,13 +51,13 @@ export function byStaticObject (obj: StaticObject, options: TransformObjectOptio
 
   // 嵌套未匹配的属性
   if (unmatchedProperties.length > 0) {
-    const validNestKey = createValidKey(options.wrapUnmatchedIn!);
+    const validNestProperty = createValidProperty(options.wrapUnmatchedIn!);
 
     properties.push(
       t.objectProperty(
-        validNestKey.id,
+        validNestProperty.key,
         t.objectExpression(unmatchedProperties),
-        validNestKey.computed,
+        validNestProperty.computed,
       ),
     );
   }

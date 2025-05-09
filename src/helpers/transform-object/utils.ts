@@ -1,24 +1,6 @@
 import * as t from '@babel/types';
-import { getPropertyMeta } from '../utils/get-property-meta';
+import { getPropertyMeta } from '../property';
 import type { StaticObject } from './types';
-
-/**
- * 创建符合 js 要求的变量标识符
- * @param key
- */
-export function createValidKey (key: string) {
-  if (t.isValidIdentifier(key)) {
-    return {
-      computed: false,
-      id: t.identifier(key),
-    };
-  }
-
-  return {
-    computed: true,
-    id: t.stringLiteral(key),
-  };
-}
 
 /**
  * 判断是否为静态字面量对象表达式，
@@ -43,7 +25,7 @@ export function isStaticObject (node: t.Expression): node is StaticObject {
  * 将 ObjectMethod 转换为 FunctionExpression
  * @param node
  */
-export function objectMethodToFunctionExpression (node: t.ObjectMethod) {
+export function methodToFunction (node: t.ObjectMethod) {
   return t.functionExpression(
     !node.computed && t.isIdentifier(node.key) ? node.key : null,
     node.params,

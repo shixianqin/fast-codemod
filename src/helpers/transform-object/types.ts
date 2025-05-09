@@ -1,7 +1,11 @@
 import type * as t from '@babel/types';
 
 export interface StaticObject extends t.ObjectExpression {
-  properties: t.ObjectMember[];
+  properties: (StaticObjectProperty | t.ObjectMethod)[];
+}
+
+export interface StaticObjectProperty extends t.ObjectProperty {
+  value: t.Expression;
 }
 
 export interface TransformObjectOptions {

@@ -8,3 +8,4 @@ export interface AddImportOptions {
 
 export type ImportKind = t.ImportDeclaration['importKind'];
 export type ImportPath = NodePath<t.ImportDeclaration>;
+export type ImportSpecifier = t.ImportDeclaration['specifiers'][0];

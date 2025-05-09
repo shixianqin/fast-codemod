@@ -1,7 +1,8 @@
 import type { NodePath } from '@babel/traverse';
 import type * as t from '@babel/types';
 import { describe, expect, test } from 'vitest';
-import { addImportDefault, addImportNamed, addImportNamespace, addImportSideEffect, transform } from '../src';
+import { transform } from '../src';
+import { addImportDefault, addImportNamed, addImportNamespace, addImportSideEffect } from '../src/helpers';
 
 function _transform (source: string[], expected: string[], visit: (path: NodePath<t.Program>) => void) {
   const { code } = transform(

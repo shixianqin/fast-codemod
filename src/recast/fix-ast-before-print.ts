@@ -10,7 +10,7 @@ function removeRange (path: NodePath) {
  * **Potential Issue:** Modified `ImportSpecifier` or `ObjectProperty` not printed correctly
  * @see https://github.com/benjamn/recast/issues/1421
  */
-export function __fixAstBeforePrint (ast: ParseResult) {
+export function fixAstBeforePrint (ast: ParseResult) {
   traverse(ast, {
     ImportSpecifier: removeRange,
     ObjectProperty: removeRange,

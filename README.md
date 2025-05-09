@@ -21,10 +21,11 @@ npm i fast-codemod -D
 ## Usage
 
 ```ts
-// @file transform.js
+// transform.js
 
 import { codemod } from 'fast-codemod'
 
+/** @type {import('fast-codemod').Transformer} */
 const renameFoo = () => {
   return {
     visitor: {
@@ -49,12 +50,12 @@ await codemod({
   globOptions: {
     // Optional: glob options
   },
-  
+
   transformers: [renameFoo],
-  
+
   dryRun: true,
   printDiff: true,
-  
+
   onResult: (fileInfo, result) => {},
 })
 ```
@@ -63,7 +64,7 @@ await codemod({
 node ./transform.js
 ```
 
-## Exports
+### Main runner
 
 ```ts
 import {
@@ -77,12 +78,21 @@ import {
   parse, // Parse code (recast)
   print, // Print code (recast)
 
+} from 'fast-codemod'
+```
+
+### Helpers
+
+```ts
+import {
   // Traverse all references of a given variable — including chained member expressions.
   traverseReferences,
   traverseImportReferences,
 
-  // Quickly remap keys in an object expression based on a given key map.
-  remapObject,
+  // Make object expression restructuring easy
+  transformObject,
+  isStaticObject,
+  createValidProperty,
 
   // Add import helpers
   addImportSideEffect,
@@ -90,26 +100,51 @@ import {
   addImportNamed,
   addImportNamespace,
 
+  // Create and insert a new variable
+  addVariable,
+
+  // Get property meta from member nodes
+  // @return { key?: string, computed?: boolean }
+  getPropertyMeta,
+
   // generateUid (Use specified name whenever possible)
   generateUid,
   generateUidIdentifier,
-  
-} from 'fast-codemod'
+
+  // Validators
+  isAssignmentLeft,
+  isAssignmentRight,
+  isCallCallee,
+  isConditionalAlternate,
+  isConditionalConsequent,
+  isConditionalTest,
+  isLogicalLeft,
+  isLogicalRight,
+  isMemberObject,
+  isMemberProperty,
+  isNewCallee,
+  isOptionalMemberObject,
+  isOptionalMemberProperty,
+  isPropertyKey,
+  isPropertyValue,
+} from 'fast-codemod/helpers'
 ```
 
-### Re-export from `@babel/traverse`
+### Re-exports
+
+From [`@babel/traverse`](https://babel.dev/docs/babel-traverse)
 
 ```ts
 import traverse, { type NodePath } from 'fast-codemod/babel/traverse'
 ```
 
-### Re-export from `@babel/types`
+From [`@babel/types`](https://babel.dev/docs/babel-types)
 
 ```ts
 import * as t from 'fast-codemod/babel/types'
 ```
 
-### Re-export from `recast`
+From [`recast`](https://github.com/benjamn/recast)
 
 ```ts
 import { parse, print } from 'fast-codemod/recast'

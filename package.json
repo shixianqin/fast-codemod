@@ -1,18 +1,39 @@
 {
   "name": "fast-codemod",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "An easy-to-use codemod toolkit for code migration - powered by Babel and Recast, with format-preserving output.",
-  "license": "MIT",
-  "author": "shixianqin",
   "type": "module",
+  "author": "shixianqin",
+  "license": "MIT",
   "exports": {
-    ".": "./dist/index.js",
-    "./babel/traverse": "./dist/babel/traverse.js",
-    "./babel/types": "./dist/babel/types.js",
-    "./recast": "./dist/recast/index.js"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./helpers": {
+      "import": "./dist/helpers/index.js",
+      "require": "./dist/helpers/index.cjs",
+      "types": "./dist/helpers/index.d.ts"
+    },
+    "./babel/traverse": {
+      "import": "./dist/babel/traverse.js",
+      "require": "./dist/babel/traverse.js",
+      "types": "./dist/babel/traverse.d.ts"
+    },
+    "./babel/types": {
+      "import": "./dist/babel/types.js",
+      "require": "./dist/babel/types.js",
+      "types": "./dist/babel/types.d.ts"
+    },
+    "./recast": {
+      "import": "./dist/recast/index.js",
+      "require": "./dist/recast/index.js",
+      "types": "./dist/recast/index.d.ts"
+    }
   },
   "files": [
-    "dist"
+    "dist/**/*.{js,cjs,ts}"
   ],
   "scripts": {
     "build": "tsup",
@@ -38,7 +59,7 @@
     "recast": "0.23.11"
   },
   "devDependencies": {
-    "@braveforge/eslint-config": "0.0.17",
+    "@braveforge/eslint-config": "0.0.18",
     "@types/node": "^22.14.1",
     "tsup": "^8.4.0",
     "typescript": "^5.8.3",

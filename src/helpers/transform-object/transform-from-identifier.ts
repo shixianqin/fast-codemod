@@ -1,46 +1,46 @@
 import * as t from '@babel/types';
+import { createValidProperty } from '../property';
 import type { ObjectProperties, TransformObjectOptions } from './types';
-import { createValidKey } from './utils';
 
 /**
  * 基于变量标识符转换
  * @param objectId
  * @param options
  */
-export function byIdentifier (objectId: t.Identifier, options: TransformObjectOptions) {
+export function transformFromIdentifier (objectId: t.Identifier, options: TransformObjectOptions) {
   const properties: ObjectProperties = [];
 
   if (options.rename) {
     for (const [oldKey, newKey] of Object.entries(options.rename)) {
       const newKeyObj = typeof newKey === 'string' ? { name: newKey } : newKey;
-      const validNewKey = createValidKey(newKeyObj.name);
-      const validOldKey = createValidKey(oldKey);
+      const validNewProperty = createValidProperty(newKeyObj.name);
+      const validOldProperty = createValidProperty(oldKey);
 
       const memberExp = t.memberExpression(
         objectId,
-        validOldKey.id,
-        validOldKey.computed,
+        validOldProperty.key,
+        validOldProperty.computed,
       );
 
       if (newKeyObj.get) {
         properties.push(
           t.objectMethod(
             'get',
-            validNewKey.id,
+            validNewProperty.key,
             [],
             t.blockStatement(
               [t.returnStatement(memberExp)],
             ),
-            validNewKey.computed,
+            validNewProperty.computed,
           ),
         );
       }
       else {
         properties.push(
           t.objectProperty(
-            validNewKey.id,
+            validNewProperty.key,
             memberExp,
-            validNewKey.computed,
+            validNewProperty.computed,
           ),
         );
       }
@@ -51,7 +51,7 @@ export function byIdentifier (objectId: t.Identifier, options: TransformObjectOp
         properties.push(
           t.objectMethod(
             'set',
-            validNewKey.id,
+            validNewProperty.key,
             [valueId],
             t.blockStatement([
               t.expressionStatement(
@@ -62,7 +62,7 @@ export function byIdentifier (objectId: t.Identifier, options: TransformObjectOp
                 ),
               ),
             ]),
-            validNewKey.computed,
+            validNewProperty.computed,
           ),
         );
       }
@@ -71,12 +71,12 @@ export function byIdentifier (objectId: t.Identifier, options: TransformObjectOp
 
   if (options.extract) {
     for (const [key, extract] of Object.entries(options.extract)) {
-      const validKey = createValidKey(key);
+      const validProperty = createValidProperty(key);
 
       const memberExp = t.memberExpression(
         objectId,
-        validKey.id,
-        validKey.computed,
+        validProperty.key,
+        validProperty.computed,
       );
 
       extract(memberExp, memberExp);
@@ -89,11 +89,11 @@ export function byIdentifier (objectId: t.Identifier, options: TransformObjectOp
     );
   }
   else if (options.wrapUnmatchedIn) {
-    const validNestKey = createValidKey(options.wrapUnmatchedIn);
+    const validNestKey = createValidProperty(options.wrapUnmatchedIn);
 
     properties.push(
       t.objectProperty(
-        validNestKey.id,
+        validNestKey.key,
         objectId,
         validNestKey.computed,
       ),

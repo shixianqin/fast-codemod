@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { t, transform, transformObject, type Transformer, type TransformObjectOptions } from '../src';
+import { t, transform, type Transformer } from '../src';
+import { transformObject, type TransformObjectOptions } from '../src/helpers';
 
 const ruleSimple: TransformObjectOptions = {
   cachedVariableName: '_config',

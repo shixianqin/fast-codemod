@@ -1,27 +1,5 @@
 import * as t from '@babel/types';
-
-export interface PropertyMeta {
-  computed?: boolean;
-  name?: string;
-}
-
-export type MemberNode =
-  | t.JSXMemberExpression
-  | t.MemberExpression
-  | t.ObjectMethod
-  | t.ObjectProperty
-  | t.OptionalMemberExpression
-  | t.TSIndexedAccessType
-  | t.TSQualifiedName;
-
-export type PropertyNode =
-  | t.JSXMemberExpression['property']
-  | t.MemberExpression['property']
-  | t.ObjectMethod['key']
-  | t.ObjectProperty['key']
-  | t.OptionalMemberExpression['property']
-  | t.TSIndexedAccessType['indexType']
-  | t.TSQualifiedName['right'];
+import type { MemberNode, PropertyMeta, PropertyNode } from './types';
 
 /**
  * 从 TSIndexedAccessType 中查找字面量 key 节点
@@ -49,7 +27,7 @@ function getTSIndexType (memberNode: t.TSIndexedAccessType) {
 export function getPropertyMeta (memberNode: MemberNode): PropertyMeta {
   let propertyNode!: PropertyNode;
   let computed: undefined | boolean;
-  let name: undefined | string;
+  let key: undefined | string;
 
   switch (memberNode.type) {
     case 'JSXMemberExpression': {
@@ -99,39 +77,39 @@ export function getPropertyMeta (memberNode: MemberNode): PropertyMeta {
       case 'DecimalLiteral':
       case 'NumericLiteral':
       case 'StringLiteral': {
-        name = String(propertyNode.value);
+        key = String(propertyNode.value);
         break;
       }
 
       case 'NullLiteral':
       case 'TSNullKeyword': {
-        name = 'null';
+        key = 'null';
         break;
       }
 
       case 'RegExpLiteral': {
-        name = `/${propertyNode.pattern}/${propertyNode.flags}`;
+        key = `/${propertyNode.pattern}/${propertyNode.flags}`;
         break;
       }
 
       case 'TemplateLiteral': {
         if (propertyNode.expressions.length === 0) {
-          name = propertyNode.quasis[0].value.cooked;
+          key = propertyNode.quasis[0].value.cooked;
         }
 
         break;
       }
 
       case 'TSUndefinedKeyword': {
-        name = 'undefined';
+        key = 'undefined';
         break;
       }
     }
 
     // 如果已经从字面量中解析出 key 值，则不属于动态 key
-    if (name !== undefined) {
+    if (key !== undefined) {
       return {
-        name,
+        key,
       };
     }
 
@@ -144,17 +122,17 @@ export function getPropertyMeta (memberNode: MemberNode): PropertyMeta {
   switch (propertyNode.type) {
     case 'Identifier':
     case 'JSXIdentifier': {
-      name = propertyNode.name;
+      key = propertyNode.name;
       break;
     }
 
     case 'PrivateName': {
-      name = propertyNode.id.name;
+      key = propertyNode.id.name;
       break;
     }
   }
 
   return {
-    name,
+    key,
   };
 }

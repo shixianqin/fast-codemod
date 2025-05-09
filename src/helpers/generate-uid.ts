@@ -5,8 +5,8 @@ function hasBinding (path: NodePath, name: string) {
   // 检查当前作用域和父级作用域是否存在
   let has = path.scope.hasBinding(name);
 
-  // 遍历所有的子作用域检查是否存在
   if (!has) {
+    // 遍历所有的子作用域检查是否存在
     path.traverse({
       Scopable: (path) => {
         if (has || path.scope.hasOwnBinding(name)) {

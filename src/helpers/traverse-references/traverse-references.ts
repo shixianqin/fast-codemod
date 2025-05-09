@@ -1,6 +1,6 @@
 import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { getPropertyMeta, type MemberNode, type PropertyMeta } from '../utils/get-property-meta';
+import { getPropertyMeta, type MemberNode, type PropertyMeta } from '../property';
 import type {
   MemberReferencePattern,
   ReferenceNode,
@@ -18,24 +18,24 @@ function getReferencePaths (scopePath: NodePath, target: t.Identifier): NodePath
 }
 
 /**
- * 判断父节点是否为成员表达式节点
- * @param parentNode
+ * 判断是否为成员表达式的对象节点
+ * @param parent
  * @param node
  */
-function isParentMemberNode (parentNode: t.Node, node: t.Node): parentNode is MemberNode {
-  switch (parentNode.type) {
+function isMemberObject (parent: t.Node, node: t.Node): parent is MemberNode {
+  switch (parent.type) {
     case 'JSXMemberExpression':
     case 'MemberExpression':
     case 'OptionalMemberExpression': {
-      return parentNode.object === node;
+      return parent.object === node;
     }
 
     case 'TSIndexedAccessType': {
-      return parentNode.objectType === node;
+      return parent.objectType === node;
     }
 
     case 'TSQualifiedName': {
-      return parentNode.left === node;
+      return parent.left === node;
     }
   }
 
@@ -49,7 +49,7 @@ function isParentMemberNode (parentNode: t.Node, node: t.Node): parentNode is Me
  */
 function matchMemberPattern (parentPattern: ReferencePattern, propertyMeta: PropertyMeta): null | MemberReferencePattern {
   for (const memberPattern of parentPattern.members || []) {
-    if (memberPattern.computed ? propertyMeta.computed : String(memberPattern.property) === propertyMeta.name) {
+    if (memberPattern.computed ? propertyMeta.computed : String(memberPattern.property) === propertyMeta.key) {
       return memberPattern;
     }
   }
@@ -82,7 +82,7 @@ function traverseByArrayPattern (scopePath: NodePath, target: t.ArrayPattern, pa
     }
 
     const memberPattern = matchMemberPattern(pattern, {
-      name: String(index),
+      key: String(index),
     });
 
     if (memberPattern) {
@@ -146,7 +146,7 @@ function visitReferencePath (originalReferencePath: NodePath, pattern: Reference
   trackPath(originalReferencePath);
 
   // 如果是链式引用，则需要递归查找父级路径
-  while (isParentMemberNode(currentParent, currentPath.node)) {
+  while (isMemberObject(currentParent, currentPath.node)) {
     const memberPattern = matchMemberPattern(currentPattern, getPropertyMeta(currentParent));
 
     if (memberPattern) {

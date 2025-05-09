@@ -1,6 +1,5 @@
 import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { findStatementPath } from './find-path';
 import { generateUidIdentifier } from './generate-uid';
 
 export interface AddVariableOptions {
@@ -15,10 +14,10 @@ export function addVariable (path: NodePath, init: t.Expression, options?: AddVa
     return init;
   }
 
-  const statementNodePath = findStatementPath(path)!;
-  const id = generateUidIdentifier(statementNodePath, options?.name);
+  const statement = path.getStatementParent()!;
+  const id = generateUidIdentifier(statement, options?.name || '_temp');
 
-  statementNodePath.insertBefore(
+  statement.insertBefore(
     t.variableDeclaration(
       kind,
       [

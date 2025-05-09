@@ -1,9 +1,9 @@
 import type { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { generateUidIdentifier } from '../utils/generate-uid';
-import { getImportDefaultLocal, getImportedName } from '../utils/import-utils';
-import { getImports } from './get-imports';
+import { generateUidIdentifier } from '../index';
+import { collectImports } from './collect-imports';
 import type { AddImportOptions } from './types';
+import { getImportDefaultLocal, getImportedName } from './utils';
 
 /**
  * addImportDefault
@@ -12,7 +12,7 @@ import type { AddImportOptions } from './types';
  * @param options
  */
 export function addImportDefault (path: NodePath, source: string, options?: AddImportOptions) {
-  const importPaths = getImports(path, source, [options?.importKind || 'value', 'value']);
+  const importPaths = collectImports(path, source, [options?.importKind || 'value', 'value']);
 
   for (const importPath of importPaths) {
     for (const specifier of importPath.node.specifiers) {
@@ -46,7 +46,7 @@ export function addImportDefault (path: NodePath, source: string, options?: AddI
  */
 export function addImportNamed (path: NodePath, name: string, source: string, options?: AddImportOptions) {
   const importKind = options?.importKind || 'value';
-  const importPaths = getImports(path, source, [importKind, 'value']);
+  const importPaths = collectImports(path, source, [importKind, 'value']);
 
   for (const importPath of importPaths) {
     for (const specifier of importPath.node.specifiers) {
@@ -63,6 +63,7 @@ export function addImportNamed (path: NodePath, name: string, source: string, op
   const local = generateUidIdentifier(path, options?.localNameHint || name);
   const newSpecifier = t.importSpecifier(local, t.identifier(name));
   const firstImportPath = importPaths[0];
+
   let targetImportPath: undefined | NodePath<t.ImportDeclaration>;
 
   newSpecifier.importKind = importKind;
@@ -105,7 +106,7 @@ export function addImportNamed (path: NodePath, name: string, source: string, op
  * @param options
  */
 export function addImportNamespace (path: NodePath, source: string, options?: AddImportOptions) {
-  const importPaths = getImports(path, source, [options?.importKind || 'value', 'value']);
+  const importPaths = collectImports(path, source, [options?.importKind || 'value', 'value']);
 
   for (const importPath of importPaths) {
     for (const specifier of importPath.node.specifiers) {
@@ -144,5 +145,5 @@ export function addImportNamespace (path: NodePath, source: string, options?: Ad
  * @param source
  */
 export function addImportSideEffect (path: NodePath, source: string) {
-  getImports(path, source, ['value']);
+  collectImports(path, source, ['value']);
 }

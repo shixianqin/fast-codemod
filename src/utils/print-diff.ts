@@ -1,21 +1,18 @@
-import { relative } from 'node:path';
 import chalk, { type ChalkInstance } from 'chalk';
 import { diffLines, diffWords, type ChangeObject } from 'diff';
 import type { PrintResult } from '../recast/print';
 import type { FileInfo } from '../transform';
+import { createFileLink } from './hyper-link';
 
 interface ChangePart extends ChangeObject<string> {
   _changeParts?: ChangePart[];
 }
 
 interface Theme {
-  bg: ChalkInstance;
   symbol: ' ' | '+' | '-';
   text: ChalkInstance;
   lineText?: ChalkInstance;
 }
-
-const cwd = process.cwd();
 
 function genLinePrefix (theme: Theme, lineIndex: number) {
   let indexPrefix = lineIndex.toString();
@@ -30,7 +27,6 @@ function genLinePrefix (theme: Theme, lineIndex: number) {
 function getTheme (part: ChangeObject<string>): Theme {
   if (part.added) {
     return {
-      bg: chalk.bgGreen,
       symbol: '+',
       text: chalk.green,
     };
@@ -38,14 +34,12 @@ function getTheme (part: ChangeObject<string>): Theme {
 
   if (part.removed) {
     return {
-      bg: chalk.bgRed,
       symbol: '-',
       text: chalk.red,
     };
   }
 
   return {
-    bg: chalk,
     lineText: chalk.gray,
     symbol: ' ',
     text: chalk.cyan,
@@ -57,11 +51,12 @@ function highlightDiffs (
   currentPart: ChangePart,
   nextPart: undefined | ChangePart,
 ) {
-  const highlight = (text: string) => theme.bg(text);
+  const highlight = (text: string) => theme.text.inverse(text);
 
   // 修改：删除部分
   if (currentPart.removed && nextPart?.added) {
     const changeParts = diffWords(currentPart.value, nextPart.value);
+
     let value = '';
 
     for (const part of changeParts) {
@@ -138,7 +133,8 @@ function printDiffLines (fileInfo: FileInfo, result: PrintResult) {
 
 export function printDiff (fileInfo: FileInfo, result: PrintResult) {
   console.log(
-    chalk.bold.underline('### ' + relative(cwd, fileInfo.path)),
+    chalk.blue.bold('###'),
+    createFileLink(fileInfo),
   );
 
   if (fileInfo.source === result.code) {
