@@ -1,8 +1,8 @@
 import type { ParseResult } from '@babel/parser';
 import { parse as recastParse, type Options } from 'recast';
-import bableParser from 'recast/parsers/babel';
-import babelTsParser from 'recast/parsers/babel-ts';
-import flowParser from 'recast/parsers/flow';
+import babelTsParser from 'recast/parsers/babel-ts.js';
+import bableParser from 'recast/parsers/babel.js';
+import flowParser from 'recast/parsers/flow.js';
 
 export interface RecastOptions extends Omit<Options, 'parser'> {
   parser?: 'babel' | 'babel-ts' | 'flow';

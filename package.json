@@ -1,36 +1,16 @@
 {
   "name": "fast-codemod",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "An easy-to-use codemod toolkit for code migration - powered by Babel and Recast, with format-preserving output.",
   "type": "module",
   "author": "shixianqin",
   "license": "MIT",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    },
-    "./helpers": {
-      "import": "./dist/helpers/index.js",
-      "require": "./dist/helpers/index.cjs",
-      "types": "./dist/helpers/index.d.ts"
-    },
-    "./babel/traverse": {
-      "import": "./dist/babel/traverse.js",
-      "require": "./dist/babel/traverse.js",
-      "types": "./dist/babel/traverse.d.ts"
-    },
-    "./babel/types": {
-      "import": "./dist/babel/types.js",
-      "require": "./dist/babel/types.js",
-      "types": "./dist/babel/types.d.ts"
-    },
-    "./recast": {
-      "import": "./dist/recast/index.js",
-      "require": "./dist/recast/index.js",
-      "types": "./dist/recast/index.d.ts"
-    }
+    ".": "./dist/index.js",
+    "./helpers": "./dist/helpers/index.js",
+    "./babel/traverse": "./dist/babel/traverse.js",
+    "./babel/types": "./dist/babel/types.js",
+    "./recast": "./dist/recast/index.js"
   },
   "files": [
     "dist/**/*.{js,cjs,ts}"
