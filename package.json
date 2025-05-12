@@ -1,6 +1,6 @@
 {
   "name": "fast-codemod",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "An easy-to-use codemod toolkit for code migration - powered by Babel and Recast, with format-preserving output.",
   "type": "module",
   "author": "shixianqin",
@@ -28,6 +28,10 @@
     "babel",
     "recast"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shixianqin/fast-codemod"
+  },
   "dependencies": {
     "@babel/parser": "^7.27.0",
     "@babel/traverse": "^7.27.0",
