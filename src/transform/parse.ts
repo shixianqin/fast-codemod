@@ -1,4 +1,4 @@
-import type { ParseResult } from '@babel/parser';
+import type { ParseResult } from '@babel/core';
 import { parse as recastParse } from 'recast';
 import babelTsParser from 'recast/parsers/babel-ts.js';
 import bableParser from 'recast/parsers/babel.js';
@@ -41,4 +41,4 @@ export function parse (source: string, options?: Options): ParseResult {
   });
 }
 
-export { type ParseResult } from '@babel/parser';
+export { type ParseResult } from '@babel/core';

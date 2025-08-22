@@ -1,4 +1,4 @@
-import type { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/core';
 import { describe, expect, test } from 'vitest';
 import { transform } from '../index';
 import { generateUid } from './index';

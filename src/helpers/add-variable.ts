@@ -1,5 +1,4 @@
-import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import { types, type NodePath } from '@babel/core';
 import { generateUidIdentifier } from './generate-uid';
 
 export interface AddVariableOptions {
@@ -7,10 +6,10 @@ export interface AddVariableOptions {
   name?: string;
 }
 
-export function addVariable (path: NodePath, init: t.Expression, options?: AddVariableOptions) {
+export function addVariable (path: NodePath, init: types.Expression, options?: AddVariableOptions) {
   const kind = options?.kind || 'const';
 
-  if (kind === 'const' && t.isIdentifier(init)) {
+  if (kind === 'const' && types.isIdentifier(init)) {
     return init;
   }
 
@@ -18,10 +17,10 @@ export function addVariable (path: NodePath, init: t.Expression, options?: AddVa
   const id = generateUidIdentifier(statement, options?.name || '_temp');
 
   statement.insertBefore(
-    t.variableDeclaration(
+    types.variableDeclaration(
       kind,
       [
-        t.variableDeclarator(
+        types.variableDeclarator(
           id,
           init,
         ),

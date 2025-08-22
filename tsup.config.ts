@@ -7,9 +7,7 @@ export default defineConfig({
   treeshake: 'smallest',
   entry: [
     './src/index.ts',
-    './src/babel/parser.ts',
-    './src/babel/traverse.ts',
-    './src/babel/types.ts',
+    './src/babel.ts',
     './src/glob.ts',
     './src/helpers/index.ts',
   ],

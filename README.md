@@ -118,22 +118,10 @@ import {
 
 ### Re-exports
 
-From [`@babel/parser`](https://babel.dev/docs/babel-parser)
+From [`@babel/core`](https://babel.dev/docs/babel-core)
 
 ```ts
-import { parse } from 'fast-codemod/babel/parser'
-```
-
-From [`@babel/traverse`](https://babel.dev/docs/babel-traverse)
-
-```ts
-import { traverse, type NodePath } from 'fast-codemod/babel/traverse'
-```
-
-From [`@babel/types`](https://babel.dev/docs/babel-types)
-
-```ts
-import * as t from 'fast-codemod/babel/types'
+import { types } from 'fast-codemod/babel'
 ```
 
 From [`fast-glob`](https://www.npmjs.com/package/fast-glob)

@@ -1,9 +1,8 @@
-import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import { types, type NodePath } from '@babel/core';
 import { describe, expect, test } from 'vitest';
 import { transform } from '../index';
 
-function transformImportSpecifier (source: string, visit: (path: NodePath<t.ImportSpecifier>) => void) {
+function transformImportSpecifier (source: string, visit: (path: NodePath<types.ImportSpecifier>) => void) {
   return transform(source, {
     transformers: [
       () => ({
@@ -15,7 +14,7 @@ function transformImportSpecifier (source: string, visit: (path: NodePath<t.Impo
   }).code;
 }
 
-function transformObjectProperty (source: string, visit: (path: NodePath<t.ObjectProperty>) => void) {
+function transformObjectProperty (source: string, visit: (path: NodePath<types.ObjectProperty>) => void) {
   return transform(source, {
     transformers: [
       () => ({
@@ -178,7 +177,7 @@ describe('Fix ast before print', () => {
 
     test('Modify the value to an expression', () => {
       const code = transformObjectProperty('const obj = { foo: bar }', (path) => {
-        path.node.value = t.callExpression(t.identifier('bar'), [t.numericLiteral(123)]);
+        path.node.value = types.callExpression(types.identifier('bar'), [types.numericLiteral(123)]);
       });
 
       expect(code).toBe('const obj = { foo: bar(123) }');
@@ -186,7 +185,7 @@ describe('Fix ast before print', () => {
 
     test('Modify the value to an expression (shorthand)', () => {
       const code = transformObjectProperty('const obj = { foo }', (path) => {
-        path.node.value = t.callExpression(t.identifier('bar'), [t.numericLiteral(123)]);
+        path.node.value = types.callExpression(types.identifier('bar'), [types.numericLiteral(123)]);
       });
 
       expect(code).toBe('const obj = { foo: bar(123) }');

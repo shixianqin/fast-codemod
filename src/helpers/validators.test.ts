@@ -1,27 +1,26 @@
 /* eslint perfectionist/sort-objects: ['error', { type: 'natural' }] */
 
-import traverse from '@babel/traverse';
-import { ASSIGNMENT_OPERATORS, BINARY_OPERATORS, LOGICAL_OPERATORS } from '@babel/types';
+import { traverse, types } from '@babel/core';
 import { describe, expect, test } from 'vitest';
 import { parse } from '../index';
 import * as validators from './validators';
 
 type ValidatorNames = keyof typeof validators;
-type TestCase = `${string}${ValidatorNames}${string}`;
+type TestCase = `${ string }${ ValidatorNames }${ string }`;
 
 const cases: {[K in ValidatorNames]: TestCase | TestCase[] } = {
-  isAssignmentLeft: ASSIGNMENT_OPERATORS.map((op): TestCase => `isAssignmentLeft ${op} 1`),
+  isAssignmentLeft: types.ASSIGNMENT_OPERATORS.map((op): TestCase => `isAssignmentLeft ${ op } 1`),
   isAssignmentPatternLeft: '[isAssignmentPatternLeft = 1] = []',
   isAssignmentPatternRight: '[a = isAssignmentPatternRight] = []',
-  isAssignmentRight: ASSIGNMENT_OPERATORS.map((op): TestCase => `foo ${op} isAssignmentRight`),
-  isBinaryLeft: BINARY_OPERATORS.map((operator): TestCase => `isBinaryLeft ${operator} foo`),
-  isBinaryRight: BINARY_OPERATORS.map((operator): TestCase => `foo ${operator} isBinaryRight`),
+  isAssignmentRight: types.ASSIGNMENT_OPERATORS.map((op): TestCase => `foo ${ op } isAssignmentRight`),
+  isBinaryLeft: types.BINARY_OPERATORS.map((operator): TestCase => `isBinaryLeft ${ operator } foo`),
+  isBinaryRight: types.BINARY_OPERATORS.map((operator): TestCase => `foo ${ operator } isBinaryRight`),
   isCallCallee: 'isCallCallee()',
   isConditionalAlternate: '1 ? 2 : isConditionalAlternate',
   isConditionalConsequent: '1 ? isConditionalConsequent : 2',
   isConditionalTest: 'isConditionalTest ? 1 : 2',
-  isLogicalLeft: LOGICAL_OPERATORS.map((operator): TestCase => `isLogicalLeft ${operator} foo`),
-  isLogicalRight: LOGICAL_OPERATORS.map((operator): TestCase => `foo ${operator} isLogicalRight`),
+  isLogicalLeft: types.LOGICAL_OPERATORS.map((operator): TestCase => `isLogicalLeft ${ operator } foo`),
+  isLogicalRight: types.LOGICAL_OPERATORS.map((operator): TestCase => `foo ${ operator } isLogicalRight`),
   isMemberObject: 'isMemberObject.foo',
   isMemberProperty: 'foo.isMemberProperty',
   isNewCallee: 'new isNewCallee()',

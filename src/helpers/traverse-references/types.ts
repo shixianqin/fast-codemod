@@ -1,5 +1,4 @@
-import type { NodePath } from '@babel/traverse';
-import type * as t from '@babel/types';
+import type { NodePath, types } from '@babel/core';
 
 /**
  * 成员访问器的联合类型
@@ -7,13 +6,13 @@ import type * as t from '@babel/types';
 export type MemberReferencePattern = ComputedMemberPattern | LiteralMemberPattern | TSKeywordMemberPattern;
 
 export type ReferenceNode =
-  t.Identifier |
-  t.JSXIdentifier |
-  t.JSXMemberExpression |
-  t.MemberExpression |
-  t.OptionalMemberExpression |
-  t.TSIndexedAccessType |
-  t.TSQualifiedName;
+  types.Identifier |
+  types.JSXIdentifier |
+  types.JSXMemberExpression |
+  types.MemberExpression |
+  types.OptionalMemberExpression |
+  types.TSIndexedAccessType |
+  types.TSQualifiedName;
 
 /**
  * 用于匹配路径节点的访问函数
@@ -25,13 +24,13 @@ export type VisitFunction<T extends ReferenceNode> = (referencePath: NodePath<T>
  * 引用访问器
  */
 export interface ReferenceVisitor {
-  Identifier?: VisitFunction<t.Identifier>;
-  JSXIdentifier?: VisitFunction<t.JSXIdentifier>;
-  JSXMemberExpression?: VisitFunction<t.JSXMemberExpression>;
-  MemberExpression?: VisitFunction<t.MemberExpression>;
-  OptionalMemberExpression?: VisitFunction<t.OptionalMemberExpression>;
-  TSIndexedAccessType?: VisitFunction<t.TSIndexedAccessType>;
-  TSQualifiedName?: VisitFunction<t.TSQualifiedName>;
+  Identifier?: VisitFunction<types.Identifier>;
+  JSXIdentifier?: VisitFunction<types.JSXIdentifier>;
+  JSXMemberExpression?: VisitFunction<types.JSXMemberExpression>;
+  MemberExpression?: VisitFunction<types.MemberExpression>;
+  OptionalMemberExpression?: VisitFunction<types.OptionalMemberExpression>;
+  TSIndexedAccessType?: VisitFunction<types.TSIndexedAccessType>;
+  TSQualifiedName?: VisitFunction<types.TSQualifiedName>;
 }
 
 /**

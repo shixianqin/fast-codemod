@@ -1,5 +1,4 @@
-import type { NodePath } from '@babel/traverse';
-import { identifier, isValidIdentifier } from '@babel/types';
+import { types, type NodePath } from '@babel/core';
 
 function hasBinding (path: NodePath, name: string) {
   // 手动刷新作用域
@@ -32,7 +31,7 @@ function hasBinding (path: NodePath, name: string) {
  * @param name
  */
 export function generateUid (path: NodePath, name?: string) {
-  if (!name || !isValidIdentifier(name) || hasBinding(path, name)) {
+  if (!name || !types.isValidIdentifier(name) || hasBinding(path, name)) {
     return path.scope.generateUid(name);
   }
 
@@ -40,7 +39,7 @@ export function generateUid (path: NodePath, name?: string) {
 }
 
 export function generateUidIdentifier (path: NodePath, name?: string) {
-  return identifier(
+  return types.identifier(
     generateUid(path, name),
   );
 }

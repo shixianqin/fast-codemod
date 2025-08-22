@@ -1,4 +1,4 @@
-import { identifier, isValidIdentifier, stringLiteral } from '@babel/types';
+import { types } from '@babel/core';
 
 /**
  * 创建符合 js 要求的属性访问标识符
@@ -14,15 +14,15 @@ import { identifier, isValidIdentifier, stringLiteral } from '@babel/types';
  * obj['a-b']; // StringLiteral + computed:true
  */
 export function createAccessedKey (key: string) {
-  if (isValidIdentifier(key, false)) {
+  if (types.isValidIdentifier(key, false)) {
     return {
       computed: false,
-      key: identifier(key),
+      key: types.identifier(key),
     };
   }
 
   return {
     computed: true,
-    key: stringLiteral(key),
+    key: types.stringLiteral(key),
   };
 }

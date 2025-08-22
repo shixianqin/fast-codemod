@@ -1,4 +1,4 @@
-import type * as t from '@babel/types';
+import type * as t from '@babel/core';
 import chalk, { type ChalkInstance } from 'chalk';
 import type { FileInfo } from '../transform';
 import { createFileUrl } from './hyper-link';
@@ -37,9 +37,9 @@ export function report (fileInfo: undefined | FileInfo, info: ReportInfo) {
   // eslint-disable-next-line no-console
   console.log(
     symbol,
-    text(`[TRANSFORM ${(info.severity || 'warn').toUpperCase()}]`),
+    text(`[TRANSFORM ${ (info.severity || 'warn').toUpperCase() }]`),
     '-',
     createFileUrl(fileInfo, info.node),
-    text(`\n${info.message}`),
+    text(`\n${ info.message }`),
   );
 }

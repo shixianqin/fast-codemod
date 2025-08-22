@@ -1,4 +1,4 @@
-import * as t from '@babel/types';
+import { types } from '@babel/core';
 import { createAccessedKey } from '../accessed-key';
 import type { ObjectProperties, TransformObjectOptions } from './types';
 
@@ -7,7 +7,7 @@ import type { ObjectProperties, TransformObjectOptions } from './types';
  * @param objectId
  * @param options
  */
-export function transformFromIdentifier (objectId: t.Identifier, options: TransformObjectOptions) {
+export function transformFromIdentifier (objectId: types.Identifier, options: TransformObjectOptions) {
   const properties: ObjectProperties = [];
 
   if (options.rename) {
@@ -16,7 +16,7 @@ export function transformFromIdentifier (objectId: t.Identifier, options: Transf
       const newAccessedKey = createAccessedKey(newKeyObj.name);
       const oldAccessedKey = createAccessedKey(oldKey);
 
-      const memberExp = t.memberExpression(
+      const memberExp = types.memberExpression(
         objectId,
         oldAccessedKey.key,
         oldAccessedKey.computed,
@@ -24,12 +24,12 @@ export function transformFromIdentifier (objectId: t.Identifier, options: Transf
 
       if (newKeyObj.get) {
         properties.push(
-          t.objectMethod(
+          types.objectMethod(
             'get',
             newAccessedKey.key,
             [],
-            t.blockStatement(
-              [t.returnStatement(memberExp)],
+            types.blockStatement(
+              [types.returnStatement(memberExp)],
             ),
             newAccessedKey.computed,
           ),
@@ -37,7 +37,7 @@ export function transformFromIdentifier (objectId: t.Identifier, options: Transf
       }
       else {
         properties.push(
-          t.objectProperty(
+          types.objectProperty(
             newAccessedKey.key,
             memberExp,
             newAccessedKey.computed,
@@ -46,16 +46,16 @@ export function transformFromIdentifier (objectId: t.Identifier, options: Transf
       }
 
       if (newKeyObj.set) {
-        const valueId = t.identifier('value');
+        const valueId = types.identifier('value');
 
         properties.push(
-          t.objectMethod(
+          types.objectMethod(
             'set',
             newAccessedKey.key,
             [valueId],
-            t.blockStatement([
-              t.expressionStatement(
-                t.assignmentExpression(
+            types.blockStatement([
+              types.expressionStatement(
+                types.assignmentExpression(
                   '=',
                   memberExp,
                   valueId,
@@ -73,7 +73,7 @@ export function transformFromIdentifier (objectId: t.Identifier, options: Transf
     for (const [key, extract] of Object.entries(options.extractor)) {
       const accessedKey = createAccessedKey(key);
 
-      const memberExp = t.memberExpression(
+      const memberExp = types.memberExpression(
         objectId,
         accessedKey.key,
         accessedKey.computed,
@@ -85,14 +85,14 @@ export function transformFromIdentifier (objectId: t.Identifier, options: Transf
 
   if (options.flatUnmatched === true) {
     properties.unshift(
-      t.spreadElement(objectId),
+      types.spreadElement(objectId),
     );
   }
   else if (options.wrapUnmatchedIn) {
     const accessedKey = createAccessedKey(options.wrapUnmatchedIn);
 
     properties.push(
-      t.objectProperty(
+      types.objectProperty(
         accessedKey.key,
         objectId,
         accessedKey.computed,
@@ -100,5 +100,5 @@ export function transformFromIdentifier (objectId: t.Identifier, options: Transf
     );
   }
 
-  return t.objectExpression(properties);
+  return types.objectExpression(properties);
 }

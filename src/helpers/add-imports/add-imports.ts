@@ -1,13 +1,6 @@
 /* eslint perfectionist/sort-modules: ['error', { type: 'natural' }] */
 
-import type { NodePath } from '@babel/traverse';
-import {
-  identifier,
-  importDefaultSpecifier,
-  importNamespaceSpecifier,
-  importSpecifier,
-  isValidIdentifier, stringLiteral,
-} from '@babel/types';
+import { types, type NodePath } from '@babel/core';
 import { Importer } from './importer';
 import type { AddImportOptions } from './types';
 import { getImportKind, isImportSpecifier } from './utils';
@@ -21,7 +14,7 @@ export function addImportDefault (path: NodePath, source: string, options?: AddI
 
   if (!local) {
     local = importer.generateLocal();
-    importer.addSpecifier(importDefaultSpecifier(local));
+    importer.addSpecifier(types.importDefaultSpecifier(local));
   }
 
   return local;
@@ -38,9 +31,9 @@ export function addImportNamed (path: NodePath, name: string, source: string, op
   if (!local) {
     local = importer.generateLocal(name);
 
-    importer.addSpecifier(importSpecifier(
+    importer.addSpecifier(types.importSpecifier(
       local,
-      isValidIdentifier(name, false) ? identifier(name) : stringLiteral(name),
+      types.isValidIdentifier(name, false) ? types.identifier(name) : types.stringLiteral(name),
     ));
   }
 
@@ -56,7 +49,7 @@ export function addImportNamespace (path: NodePath, source: string, options?: Ad
 
   if (!local) {
     local = importer.generateLocal();
-    importer.addSpecifier(importNamespaceSpecifier(local));
+    importer.addSpecifier(types.importNamespaceSpecifier(local));
   }
 
   return local;

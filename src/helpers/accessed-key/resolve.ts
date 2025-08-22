@@ -1,4 +1,4 @@
-import type { TSIndexedAccessType } from '@babel/types';
+import type { types } from '@babel/core';
 import type { AccessedKeyMeta, KeyNode, MemberNode } from './types';
 
 const tsKeywordPattern = /^TS\w+?Keyword$/;
@@ -7,7 +7,7 @@ const tsKeywordPattern = /^TS\w+?Keyword$/;
  * 从 TSIndexedAccessType 中查找字面量 key 节点
  * @param node
  */
-function getTSIndexType (node: TSIndexedAccessType) {
+function getTSIndexType (node: types.TSIndexedAccessType) {
   const { indexType } = node;
 
   if (tsKeywordPattern.test(indexType.type)) {
@@ -112,7 +112,7 @@ export function resolveAccessedKey (memberNode: MemberNode): AccessedKeyMeta {
       }
 
       case 'RegExpLiteral': {
-        key = `/${keyNode.pattern}/${keyNode.flags}`;
+        key = `/${ keyNode.pattern }/${ keyNode.flags }`;
         break;
       }
 
@@ -135,7 +135,7 @@ export function resolveAccessedKey (memberNode: MemberNode): AccessedKeyMeta {
             }
 
             case '-': {
-              key = `-${argument.value}`;
+              key = `-${ argument.value }`;
               break;
             }
 
@@ -170,7 +170,7 @@ export function resolveAccessedKey (memberNode: MemberNode): AccessedKeyMeta {
     }
 
     case 'PrivateName': {
-      key = `#${keyNode.id.name}`;
+      key = `#${ keyNode.id.name }`;
       break;
     }
 

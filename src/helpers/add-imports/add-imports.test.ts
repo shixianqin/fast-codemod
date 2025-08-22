@@ -1,6 +1,6 @@
 /* eslint perfectionist/sort-objects: ['error', { type: 'natural' }] */
 
-import type { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/core';
 import { describe, expect, test } from 'vitest';
 import { transform, type TransformParser } from '../../index';
 import { addImportDefault, addImportNamed, addImportNamespace, addImportSideEffect } from '../index';
@@ -24,22 +24,22 @@ const TEMPLATE_SOURCE = 'source';
 
 const TEMPLATES: {[K in ImportKind]: {[T in ImportType]: string }} = {
   type: {
-    default: `import type TYPE_${TEMPLATE_DEFAULT} from "${TEMPLATE_SOURCE}"`,
-    named: `import type { TYPE_${TEMPLATE_NAMED} } from "${TEMPLATE_SOURCE}"`,
-    namespace: `import type * as TYPE_${TEMPLATE_NAMESPACE} from "${TEMPLATE_SOURCE}"`,
-    sideEffect: `import "${TEMPLATE_SOURCE}"`,
+    default: `import type TYPE_${ TEMPLATE_DEFAULT } from "${ TEMPLATE_SOURCE }"`,
+    named: `import type { TYPE_${ TEMPLATE_NAMED } } from "${ TEMPLATE_SOURCE }"`,
+    namespace: `import type * as TYPE_${ TEMPLATE_NAMESPACE } from "${ TEMPLATE_SOURCE }"`,
+    sideEffect: `import "${ TEMPLATE_SOURCE }"`,
   },
   typeof: {
-    default: `import typeof TYPEOF_${TEMPLATE_DEFAULT} from "${TEMPLATE_SOURCE}"`,
-    named: `import typeof { TYPEOF_${TEMPLATE_NAMED} } from "${TEMPLATE_SOURCE}"`,
-    namespace: `import typeof * as TYPEOF_${TEMPLATE_NAMESPACE} from "${TEMPLATE_SOURCE}"`,
-    sideEffect: `import "${TEMPLATE_SOURCE}"`,
+    default: `import typeof TYPEOF_${ TEMPLATE_DEFAULT } from "${ TEMPLATE_SOURCE }"`,
+    named: `import typeof { TYPEOF_${ TEMPLATE_NAMED } } from "${ TEMPLATE_SOURCE }"`,
+    namespace: `import typeof * as TYPEOF_${ TEMPLATE_NAMESPACE } from "${ TEMPLATE_SOURCE }"`,
+    sideEffect: `import "${ TEMPLATE_SOURCE }"`,
   },
   value: {
-    default: `import VALUE_${TEMPLATE_DEFAULT} from "${TEMPLATE_SOURCE}"`,
-    named: `import { VALUE_${TEMPLATE_NAMED} } from "${TEMPLATE_SOURCE}"`,
-    namespace: `import * as VALUE_${TEMPLATE_NAMESPACE} from "${TEMPLATE_SOURCE}"`,
-    sideEffect: `import "${TEMPLATE_SOURCE}"`,
+    default: `import VALUE_${ TEMPLATE_DEFAULT } from "${ TEMPLATE_SOURCE }"`,
+    named: `import { VALUE_${ TEMPLATE_NAMED } } from "${ TEMPLATE_SOURCE }"`,
+    namespace: `import * as VALUE_${ TEMPLATE_NAMESPACE } from "${ TEMPLATE_SOURCE }"`,
+    sideEffect: `import "${ TEMPLATE_SOURCE }"`,
   },
 };
 
@@ -47,12 +47,12 @@ const addImports: {[T in ImportType]: (path: NodePath, importKind: ImportKind) =
   default: (path, importKind) => {
     addImportDefault(path, TEMPLATE_SOURCE, {
       importKind,
-      nameHint: `${importKind.toUpperCase()}_${TEMPLATE_DEFAULT}`,
+      nameHint: `${ importKind.toUpperCase() }_${ TEMPLATE_DEFAULT }`,
     });
   },
 
   named: (path, importKind) => {
-    addImportNamed(path, `${importKind.toUpperCase()}_${TEMPLATE_NAMED}`, TEMPLATE_SOURCE, {
+    addImportNamed(path, `${ importKind.toUpperCase() }_${ TEMPLATE_NAMED }`, TEMPLATE_SOURCE, {
       importKind,
     });
   },
@@ -60,7 +60,7 @@ const addImports: {[T in ImportType]: (path: NodePath, importKind: ImportKind) =
   namespace: (path, importKind) => {
     addImportNamespace(path, TEMPLATE_SOURCE, {
       importKind,
-      nameHint: `${importKind.toUpperCase()}_${TEMPLATE_NAMESPACE}`,
+      nameHint: `${ importKind.toUpperCase() }_${ TEMPLATE_NAMESPACE }`,
     });
   },
 
@@ -108,54 +108,54 @@ function getMixedExpected (input: ImportTestCase, mixin: ImportTestCase) {
   }
 
   if (input.type === 'sideEffect' && mixin.kind === 'value') {
-    return `${mixin.template};`;
+    return `${ mixin.template };`;
   }
 
   if (input.kind === mixin.kind) {
-    const keyword = input.kind === 'value' ? '' : `${input.kind} `;
-    const prefix = `${input.kind.toUpperCase()}_`;
+    const keyword = input.kind === 'value' ? '' : `${ input.kind } `;
+    const prefix = `${ input.kind.toUpperCase() }_`;
 
     if (
       (input.type === 'default' && mixin.type === 'named') ||
       (input.type === 'named' && mixin.type === 'default')
     ) {
-      return `import ${keyword + prefix + TEMPLATE_DEFAULT}, { ${prefix + TEMPLATE_NAMED} } from "${TEMPLATE_SOURCE}";`;
+      return `import ${ keyword + prefix + TEMPLATE_DEFAULT }, { ${ prefix + TEMPLATE_NAMED } } from "${ TEMPLATE_SOURCE }";`;
     }
 
     if (
       (input.type === 'default' && mixin.type === 'namespace') ||
       (input.type === 'namespace' && mixin.type === 'default')
     ) {
-      return `import ${keyword + prefix + TEMPLATE_DEFAULT}, * as ${prefix + TEMPLATE_NAMESPACE} from "${TEMPLATE_SOURCE}";`;
+      return `import ${ keyword + prefix + TEMPLATE_DEFAULT }, * as ${ prefix + TEMPLATE_NAMESPACE } from "${ TEMPLATE_SOURCE }";`;
     }
   }
 
-  return `${input.template}\n${mixin.template};`;
+  return `${ input.template }\n${ mixin.template };`;
 }
 
 for (const importKind of IMPORT_KINDS) {
   for (const importType of IMPORT_TYPES) {
     const template = TEMPLATES[importKind][importType];
-    const caseName = `${importKind}:${importType}`;
+    const caseName = `${ importKind }:${ importType }`;
 
-    test(`Add ${caseName} when there is no content`, () => {
+    test(`Add ${ caseName } when there is no content`, () => {
       const code = fastTransform('', importKind, importType);
 
-      expect(code).toBe(`${template};`);
+      expect(code).toBe(`${ template };`);
     });
 
-    test(`Add ${caseName} when there is no import`, () => {
+    test(`Add ${ caseName } when there is no import`, () => {
       const input = 'console.log(1)';
       const code = fastTransform(input, importKind, importType);
 
-      expect(code).toBe(`${template};\n${input}`);
+      expect(code).toBe(`${ template };\n${ input }`);
     });
 
-    test(`Add ${caseName} when other imports exist`, () => {
+    test(`Add ${ caseName } when other imports exist`, () => {
       const input = 'import bar from "bar"';
       const code = fastTransform(input, importKind, importType);
 
-      expect(code).toBe(`${input}\n${template};`);
+      expect(code).toBe(`${ input }\n${ template };`);
     });
 
     describe('Mixed', () => {
@@ -177,12 +177,12 @@ for (const importKind of IMPORT_KINDS) {
 
           const mixinCase: ImportTestCase = {
             kind: importKind2,
-            name: `${importKind2}:${importType2}`,
+            name: `${ importKind2 }:${ importType2 }`,
             template: TEMPLATES[importKind2][importType2],
             type: importType2,
           };
 
-          test(`${inputCase.name} & ${mixinCase.name}`, () => {
+          test(`${ inputCase.name } & ${ mixinCase.name }`, () => {
             const code = fastTransform(inputCase.template, mixinCase.kind, mixinCase.type);
 
             expect(code).toBe(getMixedExpected(inputCase, mixinCase));

@@ -1,4 +1,4 @@
-import * as t from '@babel/types';
+import { types } from '@babel/core';
 import { expect, test } from 'vitest';
 import { transform } from '../../index';
 import { traverseImportReferences, type SpecifierReferencePattern } from '../index';
@@ -9,7 +9,7 @@ function replace (type: SpecifierReferencePattern['type'], name: string): Specif
     type,
     visitor: {
       Identifier: (path) => {
-        path.replaceWith(t.identifier(`$_${type}_${name}`));
+        path.replaceWith(types.identifier(`$_${ type }_${ name }`));
       },
     },
   };

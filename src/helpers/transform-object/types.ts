@@ -1,13 +1,13 @@
-import type * as t from '@babel/types';
+import type { types } from '@babel/core';
 
-export type ObjectProperties = t.ObjectExpression['properties'];
+export type ObjectProperties = types.ObjectExpression['properties'];
 
-export interface LiteralObjectExpression extends t.ObjectExpression {
-  properties: Array<LiteralObjectProperty | t.ObjectMethod>;
+export interface LiteralObjectExpression extends types.ObjectExpression {
+  properties: Array<LiteralObjectProperty | types.ObjectMethod>;
 }
 
-export interface LiteralObjectProperty extends t.ObjectProperty {
-  value: t.Expression;
+export interface LiteralObjectProperty extends types.ObjectProperty {
+  value: types.Expression;
 }
 
 export interface TransformObjectOptions {
@@ -33,7 +33,7 @@ export interface TransformObjectOptions {
    * 如果是是计算型对象，就引用一个 member 表达式
    */
   extractor?: {
-    [K in string]: (extractedNode: t.Expression, originalNode: t.Expression | t.ObjectMember) => void
+    [K in string]: (extractedNode: types.Expression, originalNode: types.Expression | types.ObjectMember) => void
   };
 
   /**

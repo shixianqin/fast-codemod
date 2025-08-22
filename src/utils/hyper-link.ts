@@ -1,12 +1,12 @@
 import { relative } from 'node:path';
-import type { Node } from '@babel/types';
+import type { Node } from '@babel/core';
 import chalk from 'chalk';
 import type { FileInfo } from '../transform';
 
 function createNodePosition (node: undefined | Node) {
   const start = node?.loc?.start;
 
-  return start ? `:${start.line}:${start.column}` : '';
+  return start ? `:${ start.line }:${ start.column }` : '';
 }
 
 export function createFileLink (fileInfo: undefined | FileInfo, node?: Node) {
@@ -25,7 +25,7 @@ export function createFileUrl (fileInfo: undefined | FileInfo, node?: Node) {
     return '';
   }
 
-  return `file://${fileInfo.path}${createNodePosition(node)}`;
+  return `file://${ fileInfo.path }${ createNodePosition(node) }`;
 }
 
 /**

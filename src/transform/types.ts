@@ -1,12 +1,10 @@
-import type { ParseResult } from '@babel/parser';
-import type { Visitor } from '@babel/traverse';
-import type * as t from '@babel/types';
+import type { parse, types, Visitor } from '@babel/core';
 import type { Entry } from 'fast-glob';
 import type { Options as OriginalRecastOptions } from 'recast';
 import type { ReportInfo } from '../utils/report';
 
 export type TransformParser = 'babel' | 'babel-ts' | 'flow' | 'typescript' | {
-  parse: (source: string) => ParseResult;
+  parse: (source: string) => ReturnType<typeof parse>;
 };
 
 export type RecastOptions = Omit<OriginalRecastOptions, 'parser'>;
@@ -23,8 +21,7 @@ export interface TransformOptions {
 }
 
 export interface TransformApi {
-  t: typeof t;
-  types: typeof t;
+  types: typeof types;
   report: (info: ReportInfo) => void;
 }
 

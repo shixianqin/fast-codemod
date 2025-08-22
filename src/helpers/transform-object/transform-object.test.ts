@@ -1,4 +1,4 @@
-import { isIdentifier } from '@babel/types';
+import { types } from '@babel/core';
 import { describe, expect, test } from 'vitest';
 import { transform, type Transformer } from '../../index';
 import { transformObject, type TransformObjectOptions } from '../index';
@@ -42,7 +42,7 @@ const createTransformer = (options: TransformObjectOptions): Transformer => {
           return;
         }
 
-        if (isIdentifier(path.node.callee, { name: 'getObj' })) {
+        if (types.isIdentifier(path.node.callee, { name: 'getObj' })) {
           // @ts-expect-error ignore
           path.node._processed = true;
 

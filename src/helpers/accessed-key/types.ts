@@ -1,30 +1,22 @@
-import type {
-  JSXMemberExpression,
-  MemberExpression,
-  ObjectMethod,
-  ObjectProperty,
-  OptionalMemberExpression,
-  TSIndexedAccessType,
-  TSQualifiedName,
-} from '@babel/types';
+import type { types } from '@babel/core';
 
 export type MemberNode =
-  JSXMemberExpression |
-  MemberExpression |
-  ObjectMethod |
-  ObjectProperty |
-  OptionalMemberExpression |
-  TSIndexedAccessType |
-  TSQualifiedName;
+  types.JSXMemberExpression |
+  types.MemberExpression |
+  types.ObjectMethod |
+  types.ObjectProperty |
+  types.OptionalMemberExpression |
+  types.TSIndexedAccessType |
+  types.TSQualifiedName;
 
 export type KeyNode =
-  JSXMemberExpression['property'] |
-  MemberExpression['property'] |
-  ObjectMethod['key'] |
-  ObjectProperty['key'] |
-  OptionalMemberExpression['property'] |
-  TSIndexedAccessType['indexType'] |
-  TSQualifiedName['right'];
+  types.JSXMemberExpression['property'] |
+  types.MemberExpression['property'] |
+  types.ObjectMethod['key'] |
+  types.ObjectProperty['key'] |
+  types.OptionalMemberExpression['property'] |
+  types.TSIndexedAccessType['indexType'] |
+  types.TSQualifiedName['right'];
 
 export interface AccessedKeyMeta {
   computed?: boolean;

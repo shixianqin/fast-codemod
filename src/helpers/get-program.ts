@@ -1,4 +1,4 @@
-import type { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/core';
 
 export function getProgram (path: NodePath) {
   while (path) {

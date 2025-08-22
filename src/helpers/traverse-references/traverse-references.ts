@@ -1,5 +1,4 @@
-import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import { types, type NodePath } from '@babel/core';
 import { resolveAccessedKey, type AccessedKeyMeta, type MemberNode } from '../accessed-key';
 import type {
   MemberReferencePattern,
@@ -13,7 +12,7 @@ import type {
  * @param scopePath
  * @param target
  */
-function getReferencePaths (scopePath: NodePath, target: t.Identifier): NodePath[] {
+function getReferencePaths (scopePath: NodePath, target: types.Identifier): NodePath[] {
   return scopePath.scope.getBinding(target.name)?.referencePaths || [];
 }
 
@@ -22,7 +21,7 @@ function getReferencePaths (scopePath: NodePath, target: t.Identifier): NodePath
  * @param parent
  * @param node
  */
-function isMemberObject (parent: t.Node, node: t.Node): parent is MemberNode {
+function isMemberObject (parent: types.Node, node: types.Node): parent is MemberNode {
   switch (parent.type) {
     case 'JSXMemberExpression':
     case 'MemberExpression':
@@ -89,13 +88,13 @@ function matchMemberPattern (parentPattern: ReferencePattern, meta: AccessedKeyM
  * @param target
  * @param pattern
  */
-function traverseByArrayPattern (scopePath: NodePath, target: t.ArrayPattern, pattern: ReferencePattern) {
+function traverseByArrayPattern (scopePath: NodePath, target: types.ArrayPattern, pattern: ReferencePattern) {
   for (const [index, element] of target.elements.entries()) {
     if (!element) {
       continue;
     }
 
-    if (t.isRestElement(element)) {
+    if (types.isRestElement(element)) {
       if (pattern.arrayRestElement) {
         traverseReferences(scopePath, element.argument, pattern.arrayRestElement);
       }
@@ -119,9 +118,9 @@ function traverseByArrayPattern (scopePath: NodePath, target: t.ArrayPattern, pa
  * @param target
  * @param pattern
  */
-function traverseByObjectPattern (scopePath: NodePath, target: t.ObjectPattern, pattern: ReferencePattern) {
+function traverseByObjectPattern (scopePath: NodePath, target: types.ObjectPattern, pattern: ReferencePattern) {
   for (const property of target.properties) {
-    if (t.isRestElement(property)) {
+    if (types.isRestElement(property)) {
       if (pattern.objectRestElement) {
         traverseReferences(scopePath, property.argument, pattern.objectRestElement);
       }
@@ -129,7 +128,7 @@ function traverseByObjectPattern (scopePath: NodePath, target: t.ObjectPattern, 
       continue;
     }
 
-    if (!t.isLVal(property.value)) {
+    if (!types.isLVal(property.value)) {
       continue;
     }
 
@@ -155,14 +154,14 @@ function visitReferencePath (originalReferencePath: NodePath, pattern: Reference
       referencePath = path;
     }
 
-    if (t.isTSTypeReference(currentParent) || t.isTSNonNullExpression(currentParent)) {
+    if (types.isTSTypeReference(currentParent) || types.isTSNonNullExpression(currentParent)) {
       trackPath(path.parentPath!, true);
     }
   };
 
   let currentPattern = pattern;
   let currentPath!: NodePath;
-  let currentParent!: t.Node;
+  let currentParent!: types.Node;
   let referencePath!: NodePath;
 
   trackPath(originalReferencePath);
@@ -181,7 +180,7 @@ function visitReferencePath (originalReferencePath: NodePath, pattern: Reference
   }
 
   // 如果引用被赋值给了新的变量（如：const b = obj.foo），则需对新变量继续追踪引用
-  if (t.isVariableDeclarator(currentParent) && currentParent.id !== currentPath.node) {
+  if (types.isVariableDeclarator(currentParent) && currentParent.id !== currentPath.node) {
     traverseReferences(currentPath, currentParent.id, currentPattern);
   }
 
@@ -202,11 +201,11 @@ function visitReferencePath (originalReferencePath: NodePath, pattern: Reference
  */
 export function traverseReferences (
   scopePath: NodePath,
-  target: string | t.LVal | t.VoidPattern,
+  target: string | types.LVal | types.VoidPattern,
   pattern: ReferencePattern,
 ) {
   if (typeof target === 'string') {
-    target = t.identifier(target);
+    target = types.identifier(target);
   }
 
   switch (target.type) {

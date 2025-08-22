@@ -1,4 +1,4 @@
-import { functionExpression, type Node, type ObjectMethod } from '@babel/types';
+import { types, type Node } from '@babel/core';
 import { resolveAccessedKey } from '../accessed-key';
 import type { LiteralObjectExpression } from './types';
 
@@ -25,8 +25,8 @@ export function isLiteralObjectExpression (node: Node): node is LiteralObjectExp
  * 将 ObjectMethod 转换为 FunctionExpression
  * @param node
  */
-export function methodToFunction (node: ObjectMethod) {
-  return functionExpression(
+export function methodToFunction (node: types.ObjectMethod) {
+  return types.functionExpression(
     !node.computed && node.key.type === 'Identifier' ? node.key : null,
     node.params,
     node.body,

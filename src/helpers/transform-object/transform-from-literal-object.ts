@@ -1,4 +1,4 @@
-import * as t from '@babel/types';
+import { types } from '@babel/core';
 import { createAccessedKey, resolveAccessedKey } from '../accessed-key';
 import type { LiteralObjectExpression, ObjectProperties, TransformObjectOptions } from './types';
 import { methodToFunction } from './utils';
@@ -24,7 +24,7 @@ export function transformFromLiteralObject (obj: LiteralObjectExpression, option
 
     if (extract) {
       extract(
-        t.isObjectMethod(property) ? methodToFunction(property) : property.value,
+        types.isObjectMethod(property) ? methodToFunction(property) : property.value,
         property,
       );
 
@@ -54,13 +54,13 @@ export function transformFromLiteralObject (obj: LiteralObjectExpression, option
     const accessedKey = createAccessedKey(options.wrapUnmatchedIn!);
 
     properties.push(
-      t.objectProperty(
+      types.objectProperty(
         accessedKey.key,
-        t.objectExpression(unmatchedProperties),
+        types.objectExpression(unmatchedProperties),
         accessedKey.computed,
       ),
     );
   }
 
-  return t.objectExpression(properties);
+  return types.objectExpression(properties);
 }

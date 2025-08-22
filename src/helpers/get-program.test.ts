@@ -1,4 +1,4 @@
-import traverse from '@babel/traverse';
+import { traverse } from '@babel/core';
 import { expect, test } from 'vitest';
 import { parse } from '../index';
 import { getProgram } from './index';
@@ -11,7 +11,7 @@ const ast = parse(`
 
 traverse(ast, {
   enter (path) {
-    test(`get from ${path.type}`, () => {
+    test(`get from ${ path.type }`, () => {
       expect(getProgram(path).isProgram()).toBe(true);
     });
   },

@@ -1,18 +1,6 @@
 /* eslint perfectionist/sort-objects: ['error', { type: 'natural' }] */
 
-import traverse, { type NodePath } from '@babel/traverse';
-import {
-  isIdentifier,
-  LOGICAL_OPERATORS,
-  UNARY_OPERATORS,
-  UPDATE_OPERATORS,
-  type JSXMemberExpression,
-  type MemberExpression,
-  type Node,
-  type TSIndexedAccessType,
-  type TSLiteralType,
-  type TSQualifiedName,
-} from '@babel/types';
+import { traverse, types, type Node, type NodePath } from '@babel/core';
 import { describe, expect, test } from 'vitest';
 import { parse, type TransformParser } from '../../index';
 import { resolveAccessedKey, type MemberNode } from '../index';
@@ -26,9 +14,9 @@ type TestCases<T extends Node> = {
   [K in T['type']]: null | TestCase[]
 };
 
-type ObjectPropertyCases = TestCases<MemberExpression['property']>;
+type ObjectPropertyCases = TestCases<types.MemberExpression['property']>;
 
-function createObjectPropertyCases (handler: (input: string) => string, exclude?: Array<string | MemberExpression['property']['type']>) {
+function createObjectPropertyCases (handler: (input: string) => string, exclude?: Array<string | types.MemberExpression['property']['type']>) {
   return Object.fromEntries(
     Object.entries(OBJECT_PROPERTY_CASES).map(([key, value]) => {
       if (exclude?.includes(key)) {
@@ -40,22 +28,22 @@ function createObjectPropertyCases (handler: (input: string) => string, exclude?
         value && value.map((item) => {
           const source = item.input;
 
-          let input = handler(source[0] === '.' ? source : `[${source}]`);
+          let input = handler(source[0] === '.' ? source : `[${ source }]`);
 
           switch (source) {
             case '.#key': {
-              input = `class C { #key; constructor() { ${input} } }`;
+              input = `class C { #key; constructor() { ${ input } } }`;
               break;
             }
 
             case 'new.target': {
-              input = `function F () { ${input} }`;
+              input = `function F () { ${ input } }`;
               break;
             }
 
             case 'yield 1':
             case 'yield* 2': {
-              input = `function* F () { ${input} }`;
+              input = `function* F () { ${ input } }`;
               break;
             }
 
@@ -72,7 +60,7 @@ function createObjectPropertyCases (handler: (input: string) => string, exclude?
   ) as ObjectPropertyCases;
 }
 
-const JSX_MEMBER_EXPRESSION_CASES: TestCases<JSXMemberExpression['property']> = {
+const JSX_MEMBER_EXPRESSION_CASES: TestCases<types.JSXMemberExpression['property']> = {
   JSXIdentifier: [
     {
       input: 'const el = <Foo.Bar/>',
@@ -213,10 +201,10 @@ const OBJECT_PROPERTY_CASES: ObjectPropertyCases = {
       input: '<></>',
     },
   ],
-  LogicalExpression: LOGICAL_OPERATORS.map((op) => {
+  LogicalExpression: types.LOGICAL_OPERATORS.map((op) => {
     return {
       computed: true,
-      input: `a ${op} b`,
+      input: `a ${ op } b`,
     };
   }),
   MemberExpression: [
@@ -339,26 +327,26 @@ const OBJECT_PROPERTY_CASES: ObjectPropertyCases = {
   TSAsExpression: TS_EXPRESSION_CASES.map((item) => {
     return {
       ...item,
-      input: `${item.input} as any`,
+      input: `${ item.input } as any`,
     };
   }),
   TSInstantiationExpression: null, // invalid
   TSNonNullExpression: TS_EXPRESSION_CASES.map((item) => {
     return {
       ...item,
-      input: `${item.input}!`,
+      input: `${ item.input }!`,
     };
   }),
   TSSatisfiesExpression: TS_EXPRESSION_CASES.map((item) => {
     return {
       ...item,
-      input: `${item.input} satisfies any`,
+      input: `${ item.input } satisfies any`,
     };
   }),
   TSTypeAssertion: TS_EXPRESSION_CASES.map((item) => {
     return {
       ...item,
-      input: `<any>${item.input}`,
+      input: `<any>${ item.input }`,
     };
   }),
   TupleExpression: [
@@ -370,7 +358,7 @@ const OBJECT_PROPERTY_CASES: ObjectPropertyCases = {
   TypeCastExpression: TS_EXPRESSION_CASES.map((item) => {
     return {
       ...item,
-      input: `(${item.input}: any)`,
+      input: `(${ item.input }: any)`,
     };
   }),
   UnaryExpression: [
@@ -390,22 +378,22 @@ const OBJECT_PROPERTY_CASES: ObjectPropertyCases = {
       computed: true,
       input: '-"str"',
     },
-    ...UNARY_OPERATORS.map((op): TestCase => {
+    ...types.UNARY_OPERATORS.map((op): TestCase => {
       return {
         computed: true,
-        input: `${op} obj.key`,
+        input: `${ op } obj.key`,
       };
     }),
   ],
-  UpdateExpression: UPDATE_OPERATORS.flatMap((op): TestCase[] => {
+  UpdateExpression: types.UPDATE_OPERATORS.flatMap((op): TestCase[] => {
     return [
       {
         computed: true,
-        input: `${op} count`,
+        input: `${ op } count`,
       },
       {
         computed: true,
-        input: `count ${op}`,
+        input: `count ${ op }`,
       },
     ];
   }),
@@ -421,7 +409,7 @@ const OBJECT_PROPERTY_CASES: ObjectPropertyCases = {
   ],
 };
 
-const TS_INDEXED_ACCESS_TYPE_CASES: TestCases<TSIndexedAccessType['indexType'] | TSLiteralType['literal']> = {
+const TS_INDEXED_ACCESS_TYPE_CASES: TestCases<types.TSIndexedAccessType['indexType'] | types.TSLiteralType['literal']> = {
   BigIntLiteral: OBJECT_PROPERTY_CASES.BigIntLiteral,
   BooleanLiteral: OBJECT_PROPERTY_CASES.BooleanLiteral,
   NumericLiteral: OBJECT_PROPERTY_CASES.NumericLiteral,
@@ -628,16 +616,16 @@ const ALL_CASES: {[K in MemberNode['type']]: TestCases<never> } = {
   JSXMemberExpression: JSX_MEMBER_EXPRESSION_CASES,
 
   MemberExpression: createObjectPropertyCases((input) => {
-    return `foo${input}`;
+    return `foo${ input }`;
   }),
 
   ObjectMethod: createObjectPropertyCases(
-    (input) => `({ ${input[0] === '.' ? input.slice(1) : input} () {} })`,
+    (input) => `({ ${ input[0] === '.' ? input.slice(1) : input } () {} })`,
     ['PrivateName'],
   ),
 
   ObjectProperty: createObjectPropertyCases(
-    (input) => `({ ${input[0] === '.' ? input.slice(1) : input}: 1 })`,
+    (input) => `({ ${ input[0] === '.' ? input.slice(1) : input }: 1 })`,
     ['PrivateName'],
   ),
 
@@ -652,7 +640,7 @@ const ALL_CASES: {[K in MemberNode['type']]: TestCases<never> } = {
         value && value.map((item) => {
           return {
             ...item,
-            input: `type T = Foo[${item.input}]`,
+            input: `type T = Foo[${ item.input }]`,
           };
         }),
       ];
@@ -667,7 +655,7 @@ const ALL_CASES: {[K in MemberNode['type']]: TestCases<never> } = {
       },
     ],
     TSQualifiedName: null, // invalid
-  } as TestCases<TSQualifiedName['left']>,
+  } as TestCases<types.TSQualifiedName['left']>,
 };
 
 for (const [key, value] of Object.entries(ALL_CASES)) {
@@ -712,13 +700,13 @@ for (const [key, value] of Object.entries(ALL_CASES)) {
             let arrived = false;
 
             traverse(ast, {
-              [key]: (path: NodePath<MemberNode>) => {
-                const { node } = path;
+              [key]: (path: NodePath) => {
+                const { node } = path as NodePath<MemberNode>;
 
                 switch (node.type) {
                   case 'MemberExpression':
                   case 'OptionalMemberExpression': {
-                    if (!isIdentifier(node.object, { name: 'foo' })) {
+                    if (!types.isIdentifier(node.object, { name: 'foo' })) {
                       return;
                     }
 
@@ -742,7 +730,7 @@ for (const [key, value] of Object.entries(ALL_CASES)) {
                     break;
                   }
 
-                    // no default
+                  // no default
                 }
 
                 const meta = resolveAccessedKey(node);

@@ -1,7 +1,6 @@
-import type { ParseResult } from '@babel/parser';
+import { traverse, type NodePath, type ParseResult } from '@babel/core';
 import { print as recastPrint } from 'recast';
 import type { PrintResultType } from 'recast/lib/printer';
-import { traverse, type NodePath } from '../babel/traverse';
 import type { RecastOptions } from './types';
 
 export type PrintResult = PrintResultType;

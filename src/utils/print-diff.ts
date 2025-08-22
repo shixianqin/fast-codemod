@@ -17,12 +17,12 @@ function genLinePrefix (theme: Theme, lineIndex: number) {
   let indexPrefix = lineIndex.toString();
 
   while (indexPrefix.length < 6) {
-    indexPrefix = ` ${indexPrefix}`;
+    indexPrefix = ` ${ indexPrefix }`;
   }
 
   const text = theme.lineText || theme.text;
 
-  return `${text(`${indexPrefix} | `) + theme.symbol}    `;
+  return `${ text(`${ indexPrefix } | `) + theme.symbol }    `;
 }
 
 function getTheme (part: ChangeObject<string>): Theme {
@@ -104,7 +104,7 @@ function printDiffLines (fileInfo: FileInfo, result: PrintResult) {
     lines.pop();
 
     if (continueNormal) {
-      lineData += chalk.gray(`\n       ------ ${part.count} lines omitted ------\n\n`);
+      lineData += chalk.gray(`\n       ------ ${ part.count } lines omitted ------\n\n`);
     }
 
     for (const line of lines) {
@@ -125,7 +125,7 @@ function printDiffLines (fileInfo: FileInfo, result: PrintResult) {
 
       const prefix = genLinePrefix(theme, part.removed ? oldLineIndex : newLineIndex);
 
-      lineData += theme.text(`${prefix + line}\n`);
+      lineData += theme.text(`${ prefix + line }\n`);
     }
   }
 

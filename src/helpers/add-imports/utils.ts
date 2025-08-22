@@ -1,9 +1,9 @@
 /* eslint perfectionist/sort-modules: ['error', { type: 'natural', groups: ['class', 'function', 'export-function'] }] */
 
-import type { ImportSpecifier } from '@babel/types';
+import type { types } from '@babel/core';
 import type { ImportModuleSpecifier, ImportPath } from './types';
 
-export function getImportedName (specifier: ImportSpecifier) {
+export function getImportedName (specifier: types.ImportSpecifier) {
   const { imported } = specifier;
 
   return imported.type === 'Identifier' ? imported.name : imported.value;

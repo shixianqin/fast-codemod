@@ -1,5 +1,4 @@
-import type { NodePath } from '@babel/traverse';
-import * as t from '@babel/types';
+import { types, type NodePath } from '@babel/core';
 import { describe, expect, test } from 'vitest';
 import { transform } from '../../index';
 import { traverseReferences, type ReferencePattern, type ReferenceVisitor } from '../index';
@@ -26,11 +25,11 @@ function visit (level: number, hint?: string): ReferenceVisitor {
   const replace = (
     path: NodePath,
     type: string,
-    handler?: (name: string) => t.Node,
+    handler?: (name: string) => types.Node,
   ) => {
-    const name = `$_${type}_${level}${hint ? `_${hint}` : ''}`;
+    const name = `$_${ type }_${ level }${ hint ? `_${ hint }` : '' }`;
 
-    path.replaceWith(handler ? handler(name) : t.identifier(name));
+    path.replaceWith(handler ? handler(name) : types.identifier(name));
   };
 
   return {
@@ -38,10 +37,10 @@ function visit (level: number, hint?: string): ReferenceVisitor {
       replace(path, 'Identifier');
     },
     JSXIdentifier: (path) => {
-      replace(path, 'JSXIdentifier', t.jsxIdentifier);
+      replace(path, 'JSXIdentifier', types.jsxIdentifier);
     },
     JSXMemberExpression: (path) => {
-      replace(path, 'JSXMemberExpression', t.jsxIdentifier);
+      replace(path, 'JSXMemberExpression', types.jsxIdentifier);
     },
     MemberExpression: (path) => {
       replace(path, 'MemberExpression');
@@ -50,7 +49,7 @@ function visit (level: number, hint?: string): ReferenceVisitor {
       replace(path, 'OptionalMemberExpression');
     },
     TSIndexedAccessType: (path) => {
-      replace(path, 'TSIndexedAccessType', (name) => t.tsTypeReference(t.identifier(name)));
+      replace(path, 'TSIndexedAccessType', (name) => types.tsTypeReference(types.identifier(name)));
     },
     TSQualifiedName: (path) => {
       replace(path, 'TSQualifiedName');
@@ -174,7 +173,7 @@ describe('Direct', () => {
   test('Scope Safety', () => {
     const suffix = '{ const foo = 1; foo }; function fn () { const foo = 1; foo }';
 
-    _transform(`foo();${suffix}`, `$_Identifier_1();${suffix}`);
+    _transform(`foo();${ suffix }`, `$_Identifier_1();${ suffix }`);
   });
 
   test('Deep traverse', () => {

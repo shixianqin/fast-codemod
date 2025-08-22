@@ -1,4 +1,4 @@
-import type { NodePath } from '@babel/traverse';
+import type { NodePath } from '@babel/core';
 import { getImportedName } from '../add-imports/utils';
 import { getProgram } from '../get-program';
 import type { ReferencePattern } from './types';
@@ -6,7 +6,7 @@ import { traverseReferences } from './index';
 
 export type SpecifierReferencePattern = DefaultSpecifierPattern | NamedSpecifierPattern | NamespaceSpecifierPattern;
 
-type Key = `named:${string}` | Exclude<SpecifierReferencePattern['type'], 'named'>;
+type Key = `named:${ string }` | Exclude<SpecifierReferencePattern['type'], 'named'>;
 
 export interface DefaultSpecifierPattern extends ReferencePattern {
   type: 'default';
@@ -31,7 +31,7 @@ export function traverseImportReferences (
   const patternsMap = new Map<Key, SpecifierReferencePattern>(
     patterns.map((pattern) => {
       return [
-        pattern.type + (pattern.type === 'named' ? `:${pattern.imported}` : '') as Key,
+        pattern.type + (pattern.type === 'named' ? `:${ pattern.imported }` : '') as Key,
         pattern,
       ];
     }),
@@ -61,7 +61,7 @@ export function traverseImportReferences (
           }
 
           case 'ImportSpecifier': {
-            key = `named:${getImportedName(specifier)}`;
+            key = `named:${ getImportedName(specifier) }`;
             break;
           }
 

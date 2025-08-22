@@ -1,5 +1,4 @@
-import * as t from '@babel/types';
-import { traverse } from '../babel/traverse';
+import { traverse, types } from '@babel/core';
 import { report } from '../utils/report';
 import { parse } from './parse';
 import { print } from './print';
@@ -12,8 +11,7 @@ export function transform (source: string, options: TransformOptions, fileInfo?:
   });
 
   const api: TransformApi = {
-    t,
-    types: t,
+    types,
     report: (info) => report(fileInfo, info),
   };
 

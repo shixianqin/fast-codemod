@@ -1,12 +1,11 @@
-import type { NodePath } from '@babel/traverse';
-import { importDeclaration, stringLiteral, type Program } from '@babel/types';
+import { types, type NodePath } from '@babel/core';
 import { generateUidIdentifier } from '../generate-uid';
 import { getProgram } from '../get-program';
 import type { AddImportOptions, ImportKind, ImportModuleSpecifier, ImportPath } from './types';
 import { getImportKind, hasConflictSpecifier } from './utils';
 
 export class Importer {
-  program: NodePath<Program>;
+  program: NodePath<types.Program>;
   source: string;
   options?: AddImportOptions;
   importKind: ImportKind;
@@ -33,7 +32,7 @@ export class Importer {
   }
 
   addDeclaration (specifiers: ImportModuleSpecifier[]) {
-    const declaration = importDeclaration(specifiers, stringLiteral(this.source));
+    const declaration = types.importDeclaration(specifiers, types.stringLiteral(this.source));
 
     declaration.importKind = this.importKind;
 
